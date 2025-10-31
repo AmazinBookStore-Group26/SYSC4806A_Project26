@@ -3,7 +3,11 @@ package org.amazinbookstore.model;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class CartItem {
 
     @NotBlank(message = "Book ID is required")
@@ -13,7 +17,6 @@ public class CartItem {
     @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 
-    // Constructors
     public CartItem() {
     }
 
@@ -22,20 +25,4 @@ public class CartItem {
         this.quantity = quantity;
     }
 
-    // Getters and Setters
-    public String getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(String bookId) {
-        this.bookId = bookId;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
 }
