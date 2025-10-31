@@ -109,34 +109,4 @@ public class BookService {
     public void deleteBook(String id) {
         bookRepository.deleteById(id);
     }
-
-    /**
-     * Decrease inventory after purchase
-     */
-    public void decreaseInventory(String bookId, Integer quantity) {
-        Book book = getBookById(bookId);
-        if (book == null) {
-            throw new IllegalArgumentException("Book not found with id: " + bookId);
-        }
-        if (book.getStockQuantity() < quantity) {
-            throw new IllegalArgumentException("Insufficient inventory for book id: " + bookId);
-        }
-        book.setStockQuantity(book.getStockQuantity() - quantity);
-        bookRepository.save(book);
-    }
-
-    /**
-     * Update book inventory
-     */
-    public Book updateInventory(String id, Integer newInventory) {
-        Book book = getBookById(id);
-        if (newInventory < 0) {
-            throw new IllegalArgumentException("Inventory cannot be negative");
-        }
-        if (book == null) {
-            throw new IllegalArgumentException("Book not found with id: " + id);
-        }
-        book.setStockQuantity(newInventory);
-        return bookRepository.save(book);
-    }
 }
