@@ -109,4 +109,28 @@ public class BookService {
     public void deleteBook(String id) {
         bookRepository.deleteById(id);
     }
+
+    /**
+     * Decrease inventory after purchase
+     */
+    public void decreaseInventory(String bookId, Integer quantity) {
+        Book book = getBookById(bookId);
+        if (book == null) {
+            throw new IllegalArgumentException("Book not found with id: " + bookId);
+        }
+        book.setStockQuantity(book.getStockQuantity() - quantity);
+        bookRepository.save(book);
+    }
+
+    /**
+     * Update book inventory
+     */
+    public Book updateInventory(String id, Integer newInventory) {
+        Book book = getBookById(id);
+        if (book == null) {
+            throw new IllegalArgumentException("Book not found with id: " + id);
+        }
+        book.setStockQuantity(newInventory);
+        return bookRepository.save(book);
+    }
 }
