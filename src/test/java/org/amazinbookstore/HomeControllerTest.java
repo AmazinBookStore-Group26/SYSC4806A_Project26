@@ -7,8 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Unit test for HomeController - lightweight test without Spring context
- * Perfect for CI/CD pipelines as it runs quickly
+ * Unit test for HomeController - temporary lightweight test without Spring context
  */
 class HomeControllerTest {
 
