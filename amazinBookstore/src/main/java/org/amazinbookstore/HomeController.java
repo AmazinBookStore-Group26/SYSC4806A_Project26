@@ -1,4 +1,4 @@
-package org.example.amazinbookstore;
+package org.amazinbookstore;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.stereotype.Controller;
