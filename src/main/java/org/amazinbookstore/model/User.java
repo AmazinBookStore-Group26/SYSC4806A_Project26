@@ -1,5 +1,7 @@
 package org.amazinbookstore.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,19 +13,29 @@ import java.util.List;
 @Document(collection = "users")
 public class User {
 
+    @Getter
+    @Setter
     @Id
     private String id;
 
+    @Getter
+    @Setter
     @NotBlank(message = "Username is required")
     private String username;
 
+    @Getter
+    @Setter
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
 
+    @Getter
+    @Setter
     @NotBlank(message = "Password is required")
     private String password;
 
+    @Getter
+    @Setter
     private UserRole role = UserRole.CUSTOMER;
 
     // List of book IDs that the user has purchased (for recommendations)
@@ -34,53 +46,11 @@ public class User {
         OWNER
     }
 
-    // Constructors
     public User() {
     }
 
-    // Getters and Setters
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
-    }
-
     public List<String> getPurchasedBookIds() {
-        return purchasedBookIds;
+        return new ArrayList<>(purchasedBookIds);
     }
 
     public void setPurchasedBookIds(List<String> purchasedBookIds) {
