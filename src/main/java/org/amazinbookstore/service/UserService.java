@@ -4,6 +4,7 @@ import org.amazinbookstore.exception.ResourceNotFoundException;
 import org.amazinbookstore.model.User;
 import org.amazinbookstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User createUser(User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
@@ -22,7 +24,8 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        user.setPassword(user.getPassword());
+        //encode password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -33,10 +36,12 @@ public class UserService {
 
             // check if anyone else has same username under diff ID
             if (userRepository.existsByUsername(user.getUsername())) {
-                return userRepository.findByUsername(user.getUsername()).orElse(null);
+                return userRepository.findByUsername(user.getUsername())
+                        .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + user.getUsername()));
             }
 
-            user.setPassword(user.getPassword());
+            //encode password before saving
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             return userRepository.save(user);
         }
     }
@@ -57,9 +62,29 @@ public class UserService {
 
     public User updateUser(String id, User user) {
         User existingUser = getUserById(id);
+
+        // check if new username is taken
+        if (!existingUser.getUsername().equals(user.getUsername()) &&
+            userRepository.existsByUsername(user.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        // Check if new email is taken
+        if (!existingUser.getEmail().equals(user.getEmail()) &&
+            userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
         existingUser.setUsername(user.getUsername());
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
         existingUser.setRole(user.getRole());
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
         return userRepository.save(existingUser);
     }
 
