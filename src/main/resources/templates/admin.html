@@ -13,9 +13,6 @@
         <h1>Amazin Bookstore</h1>
         <nav>
             <a href="/">Home</a>
-            <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
-            <a href="/orders" sec:authorize="isAuthenticated()">My Orders</a>
-            <a href="/recommendations" sec:authorize="isAuthenticated()">Recommendations</a>
             <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
             <span sec:authorize="isAuthenticated()">
                     Welcome, <span sec:authentication="name"></span> |
