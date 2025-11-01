@@ -1,23 +1,16 @@
-package org.amazinbookstore.model;
+package org.amazinbookstore.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.amazinbookstore.validation.ValidPassword;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "users")
-public class User {
-
-    @Id
-    private String id;
+public class UserRegistrationDTO {
 
     @NotBlank(message = "Username is required")
     private String username;
@@ -33,13 +26,8 @@ public class User {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ValidPassword
     private String password;
 
-    private UserRole role = UserRole.CUSTOMER;
-
-    public enum UserRole {
-        CUSTOMER,
-        OWNER
-    }
+    private String role = "CUSTOMER"; // defaults to customer
 }

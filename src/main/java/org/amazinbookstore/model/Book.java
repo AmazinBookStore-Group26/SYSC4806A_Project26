@@ -1,18 +1,21 @@
 package org.amazinbookstore.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = "books")
 public class Book {
 
@@ -41,13 +44,12 @@ public class Book {
 
     private String description;
 
+    @Min(value = 0, message = "Stock quantity cannot be negative")
     private Integer stockQuantity;
 
     private String pictureUrl;
 
-    public Book() {
-    }
-
+    // Custom constructor for tests and basic book creation
     public Book(String title, String author, String publisher, String isbn, BigDecimal price) {
         this.title = title;
         this.author = author;
