@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Amazin Bookstore</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Amazin Bookstore</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
+            <a href="/orders" sec:authorize="isAuthenticated()">My Orders</a>
+            <a href="/recommendations" sec:authorize="isAuthenticated()">Recommendations</a>
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+            <span sec:authorize="isAuthenticated()">
+                    Welcome, <span sec:authentication="name"></span> |
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-link">Logout</button>
+                    </form>
+                </span>
+            <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="page-title">Admin Panel</h2>
+
+        <!-- Add New Book Section -->
+        <div class="admin-section">
+            <h3>Add New Book</h3>
+            <form id="createBookForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="isbn">ISBN *</label>
+                        <input type="text" id="isbn" name="isbn" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Title *</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="author">Author *</label>
+                        <input type="text" id="author" name="author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="publisher">Publisher *</label>
+                        <input type="text" id="publisher" name="publisher" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description *</label>
+                    <textarea id="description" name="description" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="genre">Genre</label>
+                        <input type="text" id="genre" name="genre">
+                    </div>
+                    <div class="form-group">
+                        <label for="publicationYear">Publication Year</label>
+                        <input type="number" id="publicationYear" name="publicationYear" min="1000" max="2100">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Price ($) *</label>
+                        <input type="number" id="price" name="price" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inventory">Inventory *</label>
+                        <input type="number" id="inventory" name="inventory" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pictureUrl">Picture URL</label>
+                    <input type="url" id="pictureUrl" name="pictureUrl">
+                </div>
+
+                <button type="submit" class="btn btn-success">Add Book</button>
+            </form>
+        </div>
+
+        <!-- Existing Books Section -->
+        <div class="admin-section">
+            <h3>Manage Books</h3>
+            <table class="cart-table">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Price</th>
+                    <th>Inventory</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="book : ${books}">
+                    <td th:text="${book.title}">Book Title</td>
+                    <td th:text="${book.author}">Author</td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(book.price, 1, 2)}">$0.00</td>
+                    <td>
+                        <span th:text="${book.inventory}">0</span>
+                        <span th:if="${book.inventory < 5}" style="color: red;"> (Low Stock)</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/book/edit/{id}(id=${book.id})}" class="btn btn-secondary">Edit</a>
+                        <button class="btn btn-danger"
+                                th:data-book-id="${book.id}"
+                                onclick="deleteBook(this.getAttribute('data-book-id'))">Delete</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>
