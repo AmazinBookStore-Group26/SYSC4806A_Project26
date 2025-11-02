@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazin Bookstore - Home</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Amazin Bookstore</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+            <span sec:authorize="isAuthenticated()">
+                    Welcome, <span sec:authentication="name"></span> |
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-link">Logout</button>
+                    </form>
+                </span>
+            <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="page-title">Browse Books</h2>
+
+        <div class="search-section">
+            <form class="search-form" method="get" action="/">
+                <input type="text" name="search" placeholder="Search by title, author, or publisher..."
+                       th:value="${currentSearch}">
+                <select name="sortBy">
+                    <option value="title">Sort by Title</option>
+                    <option value="author">Sort by Author</option>
+                    <option value="price">Sort by Price</option>
+                    <option value="publicationyear">Sort by Year</option>
+                </select>
+                <select name="order">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+                <button type="submit" class="btn">Search</button>
+                <a href="/" class="btn btn-secondary">Clear</a>
+            </form>
+        </div>
+
+        <div th:if="${books.isEmpty()}" class="empty-state">
+            <h3>No books found</h3>
+            <p>Try adjusting your search or filters</p>
+        </div>
+
+        <div class="book-grid">
+            <div th:each="book : ${books}" class="book-card">
+                <!-- Book Image -->
+                <img th:if="${book.pictureUrl != null and !book.pictureUrl.isEmpty()}"
+                     th:src="${book.pictureUrl}"
+                     th:alt="${book.title}"
+                     class="book-image">
+                <div th:unless="${book.pictureUrl != null and !book.pictureUrl.isEmpty()}"
+                     class="book-image-placeholder">
+                    📚
+                </div>
+
+                <!-- Book Content -->
+                <div class="book-card-content">
+                    <div class="book-title" th:text="${book.title}">Book Title</div>
+                    <div class="book-author">by <span th:text="${book.author}">Author Name</span></div>
+                    <div class="book-genre" th:if="${book.genre}" th:text="${book.genre}">Genre</div>
+                    <div class="book-price" th:text="'$' + ${#numbers.formatDecimal(book.price, 1, 2)}">$0.00</div>
+                    <div th:classappend="${book.inventory < 5} ? 'book-inventory low' : 'book-inventory'">
+                        <span th:if="${book.inventory > 0}" th:text="${book.inventory} + ' in stock'">10 in stock</span>
+                        <span th:if="${book.inventory == 0}" style="color: #8B4545;">Out of stock</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>
