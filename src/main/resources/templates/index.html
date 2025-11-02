@@ -69,9 +69,9 @@
                     <div class="book-author">by <span th:text="${book.author}">Author Name</span></div>
                     <div class="book-genre" th:if="${book.genre}" th:text="${book.genre}">Genre</div>
                     <div class="book-price" th:text="'$' + ${#numbers.formatDecimal(book.price, 1, 2)}">$0.00</div>
-                    <div th:classappend="${book.inventory < 5} ? 'book-inventory low' : 'book-inventory'">
-                        <span th:if="${book.inventory > 0}" th:text="${book.inventory} + ' in stock'">10 in stock</span>
-                        <span th:if="${book.inventory == 0}" style="color: #8B4545;">Out of stock</span>
+                    <div th:classappend="${book.stockQuantity < 5} ? 'book-stock-quantity low' : 'book-stock-quantity'">
+                        <span th:if="${book.stockQuantity > 0}" th:text="${book.stockQuantity} + ' in stock'">10 in stock</span>
+                        <span th:if="${book.stockQuantity == 0}" style="color: #8B4545;">Out of stock</span>
                     </div>
                 </div>
             </div>
