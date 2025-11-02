@@ -71,6 +71,70 @@ select {
     background-color: #f2f2f2;
 }
 
+/* ======= Login + Register ========= */
+
+.auth-container {
+    max-width: 480px;
+    margin: 60px auto;
+    padding: 50px;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 40px var(--shadow-light);
+}
+
+.auth-container h2 {
+    font-family: 'Georgia', serif;
+    font-size: 2em;
+    color: var(--primary-dark);
+    margin-bottom: 30px;
+    font-weight: normal;
+    text-align: center;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auth-form .btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1em;
+}
+
+.auth-links {
+    text-align: center;
+    margin-top: 25px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.auth-links a {
+    color: var(--accent-gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-gold);
+}
+
+.auth-links a:hover {
+    color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.password-requirements {
+    font-size: 0.85em;
+    color: var(--text-light);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    line-height: 1.6;
+    margin-top: 8px;
+}
+
+.error-message {
+    color: #8B4545;
+    font-size: 0.9em;
+    margin-top: 5px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
 /* ======= Optional: messages ======= */
 .success-message { color: green; }
 .error-message { color: red; }
