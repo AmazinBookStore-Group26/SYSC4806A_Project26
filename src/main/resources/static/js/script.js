@@ -62,7 +62,7 @@ if (createBookForm) {
             publisher: document.getElementById('publisher').value,
             pictureUrl: document.getElementById('pictureUrl').value,
             price: parseFloat(document.getElementById('price').value),
-            inventory: parseInt(document.getElementById('inventory').value),
+            inventory: parseInt(document.getElementById('stockQuantity').value),
             genre: document.getElementById('genre').value,
             publicationYear: parseInt(document.getElementById('publicationYear').value)
         };
@@ -84,7 +84,7 @@ if (editBookForm) {
             publisher: document.getElementById('publisher').value,
             pictureUrl: document.getElementById('pictureUrl').value,
             price: parseFloat(document.getElementById('price').value),
-            inventory: parseInt(document.getElementById('inventory').value),
+            inventory: parseInt(document.getElementById('stockQuantity').value),
             genre: document.getElementById('genre').value,
             publicationYear: parseInt(document.getElementById('publicationYear').value)
         };
