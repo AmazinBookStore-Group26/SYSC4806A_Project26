@@ -1,3 +1,6 @@
+// user ID from localStorage or use default
+const DEFAULT_USER_ID = localStorage.getItem('userId') || 'default-user';
+
 // Create book function
 function createBook(formData) {
     fetch('/api/books', {
@@ -92,3 +95,73 @@ if (editBookForm) {
     });
 }
 
+// Add to cart form
+const addToCartForm = document.getElementById('addToCartForm');
+if (addToCartForm) {
+    addToCartForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const bookId = this.dataset.bookId;
+        const quantity = document.getElementById('quantity').value;
+        addToCart(bookId, quantity);
+    });
+}
+
+// Add to cart function
+function addToCart(bookId, quantity) {
+    const url = `/api/cart/${DEFAULT_USER_ID}/items`;
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            bookId: bookId,
+            quantity: parseInt(quantity)
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            alert('Book added to cart successfully!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to add book to cart');
+        });
+}
+
+// Remove from cart function
+function removeFromCart(bookId) {
+    if (!confirm('Are you sure you want to remove this item from cart?')) {
+        return;
+    }
+
+    const url = `/api/cart/${DEFAULT_USER_ID}/items/${bookId}`;
+
+    fetch(url, {
+        method: 'DELETE'
+    })
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to remove item from cart');
+        });
+}
+
+// Update cart quantity
+function updateCartQuantity(bookId, quantity) {
+    const url = `/api/cart/${DEFAULT_USER_ID}/items/${bookId}?quantity=${quantity}`;
+
+    fetch(url, {
+        method: 'PUT'
+    })
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update quantity');
+        });
+}

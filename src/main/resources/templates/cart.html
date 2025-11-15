@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Amazin Bookstore</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Amazin Bookstore</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+            <span sec:authorize="isAuthenticated()">
+                    Welcome, <span sec:authentication="name"></span> |
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-link">Logout</button>
+                    </form>
+                </span>
+            <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="page-title">Shopping Cart</h2>
+
+        <div th:if="${cart.items.isEmpty()}" class="empty-state">
+            <h3>Your cart is empty</h3>
+            <p>Start shopping to add items to your cart</p>
+            <a href="/" class="btn">Browse Books</a>
+        </div>
+
+        <div th:if="${!cart.items.isEmpty()}">
+            <table class="cart-table">
+                <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item, iterStat : ${cart.items}">
+                    <td>
+                        <strong th:text="${books[iterStat.index].title}">Book Title</strong><br>
+                        <small th:text="'by ' + ${books[iterStat.index].author}">Author</small>
+                    </td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(books[iterStat.index].price, 1, 2)}">$0.00</td>
+                    <td>
+                        <input type="number"
+                               th:value="${item.quantity}"
+                               min="1"
+                               th:max="${books[iterStat.index].stockQuantity}"
+                               th:data-book-id="${item.bookId}"
+                               class="cart-quantity-input"
+                               onchange="updateCartQuantity(this.getAttribute('data-book-id'), this.value)">
+                    </td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(books[iterStat.index].price * item.quantity, 1, 2)}">$0.00</td>
+                    <td>
+                        <button class="btn btn-danger"
+                                th:data-book-id="${item.bookId}"
+                                onclick="removeFromCart(this.getAttribute('data-book-id'))">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="cart-total">
+                Total: $<span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span>
+            </div>
+
+            <div class="cart-actions">
+                <a href="/" class="btn btn-secondary">Continue Shopping</a>
+                <button class="btn btn-success" onclick="checkout()">Proceed to Checkout</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:if="${userId != null}">
+    // Set the userId in localStorage for the cart functionality
+    localStorage.setItem('userId', '[[${userId}]]');
+</script>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

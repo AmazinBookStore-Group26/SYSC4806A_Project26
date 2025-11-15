@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book.title} + ' - Amazin Bookstore'">Book Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Amazin Bookstore</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+            <span sec:authorize="isAuthenticated()">
+                    Welcome, <span sec:authentication="name"></span> |
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-link">Logout</button>
+                    </form>
+                </span>
+            <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <a href="/" class="btn btn-secondary">← Back to Books</a>
+
+        <div class="book-details-container">
+            <!-- Book Image -->
+            <div class="book-details-image-wrapper">
+                <img th:if="${book.pictureUrl != null and !book.pictureUrl.isEmpty()}"
+                     th:src="${book.pictureUrl}"
+                     th:alt="${book.title}">
+                <div th:unless="${book.pictureUrl != null and !book.pictureUrl.isEmpty()}"
+                     class="book-details-image-placeholder">
+                    📚
+                </div>
+            </div>
+
+            <!-- Book Information -->
+            <div class="book-details-info">
+                <h2 th:text="${book.title}">Book Title</h2>
+                <p class="book-author">by <span th:text="${book.author}">Author Name</span></p>
+
+                <div class="book-price" th:text="'$' + ${#numbers.formatDecimal(book.price, 1, 2)}">$0.00</div>
+
+                <div style="margin: 25px 0;">
+                    <p><strong>Publisher:</strong> <span th:text="${book.publisher}">Publisher</span></p>
+                    <p><strong>ISBN:</strong> <span th:text="${book.isbn}">ISBN</span></p>
+                    <p th:if="${book.genre}"><strong>Genre:</strong> <span th:text="${book.genre}">Genre</span></p>
+                    <p th:if="${book.publicationYear}"><strong>Publication Year:</strong> <span th:text="${book.publicationYear}">Year</span></p>
+                </div>
+
+                <div style="margin: 25px 0;">
+                    <p><strong>Description:</strong></p>
+                    <p th:text="${book.description}" style="margin-top: 10px; line-height: 1.8;">Book description goes here...</p>
+                </div>
+
+                <div th:classappend="${book.stockQuantity < 5} ? 'book-stockQuantity low' : 'book-stockQuantity'"
+                     style="font-size: 1.1em; margin: 20px 0;">
+                    <span th:if="${book.stockQuantity > 0}" th:text="${book.stockQuantity} + ' available'">10 available</span>
+                    <span th:if="${book.stockQuantity == 0}" style="color: #8B4545; font-weight: bold;">Out of stock</span>
+                </div>
+
+                <form th:if="${book.stockQuantity > 0}" id="addToCartForm" class="add-to-cart-form" th:attr="data-book-id=${book.id}">
+                    <label for="quantity"><strong>Quantity:</strong></label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1"
+                           th:max="${book.stockQuantity}" required>
+                    <button type="submit" class="btn btn-success">Add to Cart</button>
+                </form>
+
+                <div th:if="${book.stockQuantity == 0}">
+                    <button class="btn" disabled style="opacity: 0.5; cursor: not-allowed;">Out of Stock</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:if="${userId != null}">
+    // Set the userId in localStorage for the cart functionality
+    localStorage.setItem('userId', '[[${userId}]]');
+</script>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>
