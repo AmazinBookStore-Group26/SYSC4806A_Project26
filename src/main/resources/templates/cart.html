@@ -56,7 +56,7 @@
                         <input type="number"
                                th:value="${item.quantity}"
                                min="1"
-                               th:max="${books[iterStat.index].stockQuantity}"
+                               th:max="${books[iterStat.index].inventory}"
                                th:data-book-id="${item.bookId}"
                                class="cart-quantity-input"
                                onchange="updateCartQuantity(this.getAttribute('data-book-id'), this.value)">
