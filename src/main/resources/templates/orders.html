@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Amazin Bookstore</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Amazin Bookstore</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
+            <a href="/orders" sec:authorize="isAuthenticated()">My Orders</a>
+            <a href="/recommendations" sec:authorize="isAuthenticated()">Recommendations</a>
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+            <span sec:authorize="isAuthenticated()">
+                    Welcome, <span sec:authentication="name"></span> |
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-link">Logout</button>
+                    </form>
+                </span>
+            <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="page-title">My Orders</h2>
+
+        <div th:if="${orders.isEmpty()}" class="empty-state">
+            <h3>No orders yet</h3>
+            <p>Start shopping to place your first order</p>
+            <a href="/" class="btn">Browse Books</a>
+        </div>
+
+        <div th:each="order : ${orders}" class="order-card">
+            <div class="order-header">
+                <div>
+                    <h3>Order #<span th:text="${order.id}">ID</span></h3>
+                    <p th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy HH:mm')}">Date</p>
+                </div>
+                <div>
+                    <span class="order-status confirmed" th:text="${order.status}">Status</span>
+                </div>
+            </div>
+
+            <div class="order-items">
+                <h4>Items:</h4>
+                <div th:each="item : ${order.items}" class="order-item">
+                    <div>
+                        <strong th:text="${item.bookTitle}">Book Title</strong><br>
+                        <small>Quantity: <span th:text="${item.quantity}">1</span></small>
+                    </div>
+                    <div>
+                        <strong th:text="'$' + ${#numbers.formatDecimal(item.priceAtPurchase * item.quantity, 1, 2)}">$0.00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 15px; font-size: 1.2em;">
+                <strong>Total: $<span th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">0.00</span></strong>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>
