@@ -530,6 +530,55 @@ select {
     font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
+/* ======= Orders ======= */
+.order-card {
+    background: var(--background-cream);
+    padding: 30px;
+    margin-bottom: 25px;
+    border-left: 4px solid var(--accent-gold);
+    border: 1px solid var(--border-color);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.order-id {
+    font-family: 'Georgia', serif;
+    font-size: 1.2em;
+    color: var(--primary-dark);
+}
+
+.order-status {
+    padding: 8px 20px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.order-status.confirmed {
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+}
+
+.order-items {
+    margin: 20px 0;
+}
+
+.order-item {
+    padding: 15px;
+    background: var(--background-light);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid var(--border-color);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
 /* ======= Optional: messages ======= */
 .success-message { color: green; }
 .error-message { color: red; }
