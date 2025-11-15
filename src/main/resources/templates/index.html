@@ -74,12 +74,17 @@
                         <span th:if="${book.stockQuantity > 0}" th:text="${book.stockQuantity} + ' in stock'">10 in stock</span>
                         <span th:if="${book.stockQuantity == 0}" style="color: #8B4545;">Out of stock</span>
                     </div>
+                    <a th:href="@{/book/{id}(id=${book.id})}" class="btn">View Details</a>
                 </div>
             </div>
         </div>
     </main>
 </div>
 
+<script th:if="${userId != null}">
+    // Set the userId in localStorage for the cart functionality
+    localStorage.setItem('userId', '[[${userId}]]');
+</script>
 <script th:src="@{/js/script.js}"></script>
 </body>
 </html>

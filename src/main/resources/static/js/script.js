@@ -95,6 +95,16 @@ if (editBookForm) {
     });
 }
 
+// Add to cart form
+const addToCartForm = document.getElementById('addToCartForm');
+if (addToCartForm) {
+    addToCartForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const bookId = this.dataset.bookId;
+        const quantity = document.getElementById('quantity').value;
+        addToCart(bookId, quantity);
+    });
+}
 
 // Add to cart function
 function addToCart(bookId, quantity) {

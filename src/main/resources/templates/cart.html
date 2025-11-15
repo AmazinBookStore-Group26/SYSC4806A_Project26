@@ -56,7 +56,7 @@
                         <input type="number"
                                th:value="${item.quantity}"
                                min="1"
-                               th:max="${books[iterStat.index].inventory}"
+                               th:max="${books[iterStat.index].stockQuantity}"
                                th:data-book-id="${item.bookId}"
                                class="cart-quantity-input"
                                onchange="updateCartQuantity(this.getAttribute('data-book-id'), this.value)">
@@ -85,6 +85,10 @@
     </main>
 </div>
 
+<script th:if="${userId != null}">
+    // Set the userId in localStorage for the cart functionality
+    localStorage.setItem('userId', '[[${userId}]]');
+</script>
 <script th:src="@{/js/script.js}"></script>
 </body>
 </html>
