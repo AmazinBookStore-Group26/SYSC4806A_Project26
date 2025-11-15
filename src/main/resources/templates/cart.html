@@ -79,15 +79,81 @@
 
             <div class="cart-actions">
                 <a href="/" class="btn btn-secondary">Continue Shopping</a>
-                <button class="btn btn-success" onclick="checkout()">Proceed to Checkout</button>
+                <button class="btn btn-success" onclick="showCheckoutModal()" sec:authorize="isAuthenticated()">Proceed to Checkout</button>
+                <a href="/login" class="btn btn-success" sec:authorize="!isAuthenticated()">Login to Checkout</a>
             </div>
         </div>
     </main>
 </div>
 
+<!-- Checkout Modal -->
+<div id="checkoutModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Checkout</h2>
+            <span class="close" onclick="closeCheckoutModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h3>Order Summary</h3>
+            <div class="cart-total" style="margin: 20px 0; font-size: 1.2em;">
+                Total: $<span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span>
+            </div>
+
+            <form id="checkoutForm" onsubmit="processCheckout(event)">
+                <h3>Payment Details (Simulation)</h3>
+
+                <div class="form-group">
+                    <label for="cardName">Cardholder Name *</label>
+                    <input type="text" id="cardName" name="cardName" required placeholder="John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label for="cardNumber">Card Number *</label>
+                    <input type="text" id="cardNumber" name="cardNumber" required
+                           placeholder="1234 5678 9012 3456"
+                           pattern="\d{4}\s?\d{4}\s?\d{4}\s?\d{4}"
+                           maxlength="19">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiryDate">Expiry Date *</label>
+                        <input type="text" id="expiryDate" name="expiryDate" required
+                               placeholder="MM/YY"
+                               pattern="\d{2}/\d{2}"
+                               maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv">CVV *</label>
+                        <input type="text" id="cvv" name="cvv" required
+                               placeholder="123"
+                               pattern="\d{3,4}"
+                               maxlength="4">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="billingAddress">Billing Address *</label>
+                    <textarea id="billingAddress" name="billingAddress" required
+                              placeholder="123 Main St, City, State, ZIP"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-success">Complete Order</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCheckoutModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script th:if="${userId != null}">
     // Set the userId in localStorage for the cart functionality
     localStorage.setItem('userId', '[[${userId}]]');
+</script>
+<script th:if="${total != null}">
+    // Set the cart total for checkout
+    localStorage.setItem('cartTotal', '[[${total}]]');
 </script>
 <script th:src="@{/js/script.js}"></script>
 </body>
