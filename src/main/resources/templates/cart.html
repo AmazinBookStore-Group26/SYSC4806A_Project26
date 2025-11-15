@@ -151,10 +151,6 @@
     // Set the userId in localStorage for the cart functionality
     localStorage.setItem('userId', '[[${userId}]]');
 </script>
-<script th:if="${total != null}">
-    // Set the cart total for checkout
-    localStorage.setItem('cartTotal', '[[${total}]]');
-</script>
 <script th:src="@{/js/script.js}"></script>
 </body>
 </html>
