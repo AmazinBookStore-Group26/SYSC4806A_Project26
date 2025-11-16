@@ -14,6 +14,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for BookController.
+ * Tests all REST API endpoints for book management operations.
+ */
 class BookControllerTest {
 
     private BookService bookService;
@@ -21,6 +25,10 @@ class BookControllerTest {
     private Book book1;
     private Book book2;
 
+    /**
+     * Sets up test data and mocks before each test.
+     * Initializes two sample books and mocked BookService.
+     */
     @BeforeEach
     void setUp() {
         bookService = mock(BookService.class);
@@ -33,6 +41,10 @@ class BookControllerTest {
         book2.setId("2");
     }
 
+    /**
+     * Tests searching for books without any filters.
+     * Should return all books and verify service is called correctly.
+     */
     @Test
     void testSearchBooks_NoFilters() {
         when(bookService.searchBooks(null, null, null, null, null))
@@ -46,6 +58,10 @@ class BookControllerTest {
         verify(bookService, times(1)).searchBooks(null, null, null, null, null);
     }
 
+    /**
+     * Tests searching for books with author filter.
+     * Should return only books matching the specified author.
+     */
     @Test
     void testSearchBooks_WithAuthorFilter() {
         when(bookService.searchBooks("Orwell", null, null, null, null))
@@ -59,6 +75,10 @@ class BookControllerTest {
         assertEquals("1984", response.getBody().get(0).getTitle());
     }
 
+    /**
+     * Tests searching for books with price sorting.
+     * Should return books sorted by price in ascending order.
+     */
     @Test
     void testSearchBooks_WithSort() {
         when(bookService.searchBooks(null, null, null, null, "price"))
@@ -72,6 +92,10 @@ class BookControllerTest {
         assertTrue(response.getBody().get(0).getPrice().compareTo(response.getBody().get(1).getPrice()) <= 0);
     }
 
+    /**
+     * Tests retrieving a book by ID when the book exists.
+     * Should return OK status and the correct book.
+     */
     @Test
     void testGetBookById_Found() {
         when(bookService.getBookById("1")).thenReturn(book1);
@@ -84,6 +108,10 @@ class BookControllerTest {
         verify(bookService, times(1)).getBookById("1");
     }
 
+    /**
+     * Tests retrieving a book by ID when the book does not exist.
+     * Should return NOT_FOUND status.
+     */
     @Test
     void testGetBookById_NotFound() {
         when(bookService.getBookById("999")).thenReturn(null);
@@ -94,6 +122,10 @@ class BookControllerTest {
         verify(bookService, times(1)).getBookById("999");
     }
 
+    /**
+     * Tests creating a new book.
+     * Should return CREATED status and the saved book.
+     */
     @Test
     void testCreateBook() {
         when(bookService.saveBook(any(Book.class))).thenReturn(book1);
@@ -106,6 +138,10 @@ class BookControllerTest {
         verify(bookService, times(1)).saveBook(any(Book.class));
     }
 
+    /**
+     * Tests updating an existing book successfully.
+     * Should return OK status and the updated book.
+     */
     @Test
     void testUpdateBook_Success() {
         when(bookService.getBookById("1")).thenReturn(book1);
@@ -119,6 +155,10 @@ class BookControllerTest {
         verify(bookService, times(1)).saveBook(any(Book.class));
     }
 
+    /**
+     * Tests updating a book that does not exist.
+     * Should return NOT_FOUND status and not save the book.
+     */
     @Test
     void testUpdateBook_NotFound() {
         when(bookService.getBookById("999")).thenReturn(null);
@@ -130,6 +170,10 @@ class BookControllerTest {
         verify(bookService, times(0)).saveBook(any(Book.class));
     }
 
+    /**
+     * Tests deleting an existing book successfully.
+     * Should return NO_CONTENT status and delete the book.
+     */
     @Test
     void testDeleteBook_Success() {
         when(bookService.getBookById("1")).thenReturn(book1);
@@ -142,6 +186,10 @@ class BookControllerTest {
         verify(bookService, times(1)).deleteBook("1");
     }
 
+    /**
+     * Tests deleting a book that does not exist.
+     * Should return NOT_FOUND status and not attempt deletion.
+     */
     @Test
     void testDeleteBook_NotFound() {
         when(bookService.getBookById("999")).thenReturn(null);

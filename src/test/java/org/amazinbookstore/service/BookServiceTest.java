@@ -17,6 +17,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for BookService.
+ * Tests all business logic for book search, filtering, sorting, and CRUD operations.
+ */
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
 
@@ -30,6 +34,10 @@ class BookServiceTest {
     private Book book2;
     private Book book3;
 
+    /**
+     * Sets up test data before each test.
+     * Initializes three sample books with different attributes for testing filtering and sorting.
+     */
     @BeforeEach
     void setUp() {
         book1 = new Book("The Great Gatsby", "F. Scott Fitzgerald", "Scribner", "978-0743273565", new BigDecimal("15.99"));
@@ -48,6 +56,10 @@ class BookServiceTest {
         book3.setPublicationYear(1960);
     }
 
+    /**
+     * Tests searching for books by author.
+     * Should return books matching the author name with case-insensitive partial matching.
+     */
     @Test
     void testSearchBooks_WithAuthor() {
         when(bookRepository.findByAuthorContainingIgnoreCase("Orwell"))
@@ -60,6 +72,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findByAuthorContainingIgnoreCase("Orwell");
     }
 
+    /**
+     * Tests searching for books by publisher.
+     * Should return books matching the publisher name with case-insensitive partial matching.
+     */
     @Test
     void testSearchBooks_WithPublisher() {
         when(bookRepository.findByPublisherContainingIgnoreCase("Harper"))
@@ -72,6 +88,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findByPublisherContainingIgnoreCase("Harper");
     }
 
+    /**
+     * Tests searching for books by genre.
+     * Should return all books matching the genre with case-insensitive partial matching.
+     */
     @Test
     void testSearchBooks_WithGenre() {
         when(bookRepository.findByGenreContainingIgnoreCase("Fiction"))
@@ -83,6 +103,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findByGenreContainingIgnoreCase("Fiction");
     }
 
+    /**
+     * Tests searching for books by both author and publisher.
+     * Should return books matching both criteria.
+     */
     @Test
     void testSearchBooks_WithAuthorAndPublisher() {
         when(bookRepository.findByAuthorAndPublisher("Fitzgerald", "Scribner"))
@@ -95,6 +119,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findByAuthorAndPublisher("Fitzgerald", "Scribner");
     }
 
+    /**
+     * Tests searching for books without any filters.
+     * Should return all books in the repository.
+     */
     @Test
     void testSearchBooks_NoFilters() {
         when(bookRepository.findAll()).thenReturn(Arrays.asList(book1, book2, book3));
@@ -105,6 +133,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findAll();
     }
 
+    /**
+     * Tests sorting books by price in ascending order.
+     * Should return books ordered from lowest to highest price.
+     */
     @Test
     void testSearchBooks_SortByPrice() {
         when(bookRepository.findAll()).thenReturn(Arrays.asList(book1, book2, book3));
@@ -117,6 +149,10 @@ class BookServiceTest {
         assertEquals(new BigDecimal("18.99"), result.get(2).getPrice());
     }
 
+    /**
+     * Tests sorting books by price in descending order.
+     * Should return books ordered from highest to lowest price.
+     */
     @Test
     void testSearchBooks_SortByPriceDesc() {
         when(bookRepository.findAll()).thenReturn(Arrays.asList(book1, book2, book3));
@@ -129,6 +165,10 @@ class BookServiceTest {
         assertEquals(new BigDecimal("12.99"), result.get(2).getPrice());
     }
 
+    /**
+     * Tests sorting books by title alphabetically.
+     * Should return books ordered alphabetically by title (case-insensitive).
+     */
     @Test
     void testSearchBooks_SortByTitle() {
         when(bookRepository.findAll()).thenReturn(Arrays.asList(book1, book2, book3));
@@ -141,6 +181,10 @@ class BookServiceTest {
         assertEquals("To Kill a Mockingbird", result.get(2).getTitle());
     }
 
+    /**
+     * Tests retrieving all books without filtering or sorting.
+     * Should return all books from the repository.
+     */
     @Test
     void testGetAllBooks() {
         when(bookRepository.findAll()).thenReturn(Arrays.asList(book1, book2, book3));
@@ -151,6 +195,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findAll();
     }
 
+    /**
+     * Tests retrieving a book by ID when the book exists.
+     * Should return the book with matching ID.
+     */
     @Test
     void testGetBookById_Found() {
         when(bookRepository.findById("1")).thenReturn(Optional.of(book1));
@@ -162,6 +210,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findById("1");
     }
 
+    /**
+     * Tests retrieving a book by ID when the book does not exist.
+     * Should return null.
+     */
     @Test
     void testGetBookById_NotFound() {
         when(bookRepository.findById("999")).thenReturn(Optional.empty());
@@ -172,6 +224,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findById("999");
     }
 
+    /**
+     * Tests saving a book to the repository.
+     * Should persist the book and return the saved instance.
+     */
     @Test
     void testSaveBook() {
         when(bookRepository.save(book1)).thenReturn(book1);
@@ -183,6 +239,10 @@ class BookServiceTest {
         verify(bookRepository, times(1)).save(book1);
     }
 
+    /**
+     * Tests deleting a book by ID.
+     * Should remove the book from the repository.
+     */
     @Test
     void testDeleteBook() {
         doNothing().when(bookRepository).deleteById("1");
