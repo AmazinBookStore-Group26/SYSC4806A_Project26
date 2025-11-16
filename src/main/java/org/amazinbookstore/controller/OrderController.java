@@ -17,6 +17,12 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    @PostMapping("/checkout/{userId}")
+    public ResponseEntity<Order> checkout(@PathVariable String userId) {
+        Order order = orderService.createOrderFromCart(userId);
+        return new ResponseEntity<>(order, HttpStatus.CREATED);
+    }
+
     @GetMapping("/{orderId}")
     public ResponseEntity<Order> getOrderById(@PathVariable String orderId) {
         Order order = orderService.getOrderById(orderId);
@@ -44,4 +50,3 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 }
-
