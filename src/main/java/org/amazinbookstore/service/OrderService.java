@@ -14,7 +14,6 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-
     public Order getOrderById(String orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
