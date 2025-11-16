@@ -694,18 +694,6 @@ select {
     font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-.book-stock-quantity {
-    color: var(--text-light);
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    font-size: 0.9em;
-    margin-bottom: 15px;
-}
-
-.book-stock-quantity.low {
-    color: #8B4545;
-    font-weight: 600;
-}
-
 /* ======= Book Details Page ======= */
 .book-details-container {
     display: grid;

@@ -58,12 +58,4 @@ public class Book {
         this.price = price;
     }
 
-
-    public @Min(value = 0, message = "Stock quantity cannot be negative") Integer getStockQuantity() {
-        return stockQuantity;
-    }
-
-    public @NotNull(message = "Price is required") @Positive(message = "Price must be positive") BigDecimal getPrice() {
-        return price;
-    }
 }

@@ -133,7 +133,7 @@ The application uses **MongoDB** as its NoSQL database with the following collec
 | `genre` | String | Optional | Book genre/category |
 | `publicationYear` | Integer | Optional | Year of publication |
 | `description` | String | Optional | Book description |
-| `stockQuantity` | Integer | Min: 0 | Available inventory count |
+| `inventory` | Integer | Min: 0 | Available inventory count |
 | `pictureUrl` | String | Optional | URL to book cover image |
 
 ### Collection: `users`
