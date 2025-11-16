@@ -2,9 +2,11 @@ package org.amazinbookstore.controller;
 
 import org.amazinbookstore.exception.ResourceNotFoundException;
 import org.amazinbookstore.model.Book;
+import org.amazinbookstore.model.Order;
 import org.amazinbookstore.model.ShoppingCart;
 import org.amazinbookstore.model.User;
 import org.amazinbookstore.service.BookService;
+import org.amazinbookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.amazinbookstore.service.ShoppingCartService;
 import org.amazinbookstore.service.UserService;
@@ -22,6 +24,8 @@ public class ViewController {
     private final BookService bookService;
     private final ShoppingCartService shoppingCartService;
     private final UserService userService;
+    private final OrderService orderService;
+
 
     @GetMapping("/")
     public String home(Model model,
@@ -131,5 +135,15 @@ public class ViewController {
         }
 
         return "book-details";
+    }
+
+    @GetMapping("/orders")
+    public String viewOrders(Principal principal, Model model) {
+        User user = getCurrentUser(principal);
+        String userId = user.getId();
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        model.addAttribute("orders", orders);
+        model.addAttribute("userId", userId);
+        return "orders";
     }
 }
