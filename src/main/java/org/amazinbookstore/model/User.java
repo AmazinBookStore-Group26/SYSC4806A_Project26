@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -41,7 +41,7 @@ public class User {
 
     private UserRole role = UserRole.CUSTOMER;
 
-    private List<String> purchasedBookIds;
+    private List<String> purchasedBookIds = new ArrayList<>();
 
     public enum UserRole {
         CUSTOMER,

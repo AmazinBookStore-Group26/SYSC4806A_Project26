@@ -44,8 +44,8 @@ public class Book {
 
     private String description;
 
-    @Min(value = 0, message = "Stock quantity cannot be negative")
-    private Integer stockQuantity;
+    @Min(value = 0, message = "Inventory cannot be negative")
+    private Integer inventory;
 
     private String pictureUrl;
 
