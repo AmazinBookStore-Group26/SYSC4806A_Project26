@@ -153,7 +153,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\t\r\n\"title\": \"Something Special\",\t\r\n\"author\": \"Weird Name\",\t\r\n\"publisher\": \"Made up Title\",\t\r\n\"isbn\": \"978-0345539434\",\t\r\n\"price\": 18.00,\t\r\n\"genre\": \"Science\",\t\r\n\"publicationYear\": 1976,\t\r\n\"stockQuantity\": 2\t\r\n}",
+					"raw": "{\t\r\n\"title\": \"Something Special\",\t\r\n\"author\": \"Weird Name\",\t\r\n\"publisher\": \"Made up Title\",\t\r\n\"isbn\": \"978-0345539434\",\t\r\n\"price\": 18.00,\t\r\n\"genre\": \"Science\",\t\r\n\"publicationYear\": 1976,\t\r\n\"inventory\": 2\t\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -205,7 +205,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\t\r\n\"title\": \"Something Special (Updated)\",\t\r\n\"author\": \"Weird Name\",\t\r\n\"publisher\": \"Made up Publisher\",\t\r\n\"isbn\": \"978-0345539434\",\t\r\n\"price\": 20.00,\t\r\n\"genre\": \"Science\",\t\r\n\"publicationYear\": 2025,\t\r\n\"stockQuantity\": 2\t\r\n}",
+					"raw": "{\t\r\n\"title\": \"Something Special (Updated)\",\t\r\n\"author\": \"Weird Name\",\t\r\n\"publisher\": \"Made up Publisher\",\t\r\n\"isbn\": \"978-0345539434\",\t\r\n\"price\": 20.00,\t\r\n\"genre\": \"Science\",\t\r\n\"publicationYear\": 2025,\t\r\n\"inventory\": 2\t\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -244,7 +244,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\t\r\n\"title\": \"Something Special\",\t\r\n\"author\": \"Weird Name\",\t\r\n\"publisher\": \"Made up Title\",\t\r\n\"isbn\": \"978-0345539434\",\t\r\n\"price\": 18.00,\t\r\n\"genre\": \"Science\",\t\r\n\"publicationYear\": 1976,\t\r\n\"stockQuantity\": 2\t\r\n}"
+					"raw": "{\t\r\n\"title\": \"Something Special\",\t\r\n\"author\": \"Weird Name\",\t\r\n\"publisher\": \"Made up Title\",\t\r\n\"isbn\": \"978-0345539434\",\t\r\n\"price\": 18.00,\t\r\n\"genre\": \"Science\",\t\r\n\"publicationYear\": 1976,\t\r\n\"inventory\": 2\t\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/books/1",
