@@ -16,7 +16,8 @@
         <nav>
           <a href="/">Home</a>
           <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
-          <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+            <a href="/orders" sec:authorize="isAuthenticated()">My Orders</a>
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
           <span sec:authorize="isAuthenticated()">
             Welcome, <span sec:authentication="name"></span> |
             <form th:action="@{/logout}" method="post" style="display: inline">
@@ -89,7 +90,7 @@
             </div>
 
             <div
-              th:classappend="${book.inventory < 5} ? 'book-stockQuantity low' : 'book-stockQuantity'"
+              th:classappend="${book.inventory < 5} ? 'book-inventory low' : 'book-inventory'"
               style="font-size: 1.1em; margin: 20px 0"
             >
               <span

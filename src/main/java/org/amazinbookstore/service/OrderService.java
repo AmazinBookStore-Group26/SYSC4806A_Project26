@@ -34,10 +34,10 @@ public class OrderService {
         // Validate inventory for all items
         for (CartItem cartItem : cart.getItems()) {
             Book book = bookService.getBookById(cartItem.getBookId());
-            if (book.getStockQuantity() < cartItem.getQuantity()) {
+            if (book.getInventory() < cartItem.getQuantity()) {
                 throw new InsufficientInventoryException(
                         "Insufficient inventory for book: " + book.getTitle() +
-                                ". Available: " + book.getStockQuantity() +
+                                ". Available: " + book.getInventory() +
                                 ", Requested: " + cartItem.getQuantity()
                 );
             }

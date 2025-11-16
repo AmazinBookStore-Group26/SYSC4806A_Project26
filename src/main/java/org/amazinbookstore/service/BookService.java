@@ -112,23 +112,9 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    public void decreaseInventory(String id, @NotNull(message = "Quantity is required") @Min(value = 1, message = "Quantity must be at least 1") Integer quantity) {
-        //  Find the book by its ID. If it doesn't exist throw an error
-        Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new java.util.NoSuchElementException("That book ID doesn't exist!"));
-
-        //  This gets the new stock by calculating the previous stock minus the quantity being purchased
-        int newStock = book.getStockQuantity() - quantity;
-
-        //  In case the user is trying to purchase more books than exist
-        if (newStock < 0) {
-            throw new IllegalArgumentException("Not enough stock for this order!");
-        }
-
-        // Will update the object with the new value
-        book.setStockQuantity(newStock);
-
-        // Then it gets saved in the repo
+    public void decreaseInventory(String bookId, Integer quantity) {
+        Book book = getBookById(bookId);
+        book.setInventory(book.getInventory() - quantity);
         bookRepository.save(book);
     }
 }
