@@ -18,6 +18,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for UserService.
+ * Tests user CRUD operations, authentication, and validation logic.
+ */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -33,6 +37,10 @@ class UserServiceTest {
     private User user1;
     private User user2;
 
+    /**
+     * Sets up test data before each test.
+     * Initializes two sample users with different roles for testing.
+     */
     @BeforeEach
     void setUp() {
         user1 = new User();
@@ -54,6 +62,10 @@ class UserServiceTest {
         user2.setRole(User.UserRole.OWNER);
     }
 
+    /**
+     * Tests successfully creating a new user.
+     * Should encode the password and save the user to the repository.
+     */
     @Test
     void testCreateUser_Success() {
         when(userRepository.existsByUsername(user1.getUsername())).thenReturn(false);
@@ -71,6 +83,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(any(User.class));
     }
 
+    /**
+     * Tests creating a user when the username already exists.
+     * Should throw IllegalArgumentException and not save the user.
+     */
     @Test
     void testCreateUser_UsernameAlreadyExists() {
         when(userRepository.existsByUsername(user1.getUsername())).thenReturn(true);
@@ -84,6 +100,10 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    /**
+     * Tests creating a user when the email already exists.
+     * Should throw IllegalArgumentException and not save the user.
+     */
     @Test
     void testCreateUser_EmailAlreadyExists() {
         when(userRepository.existsByUsername(user1.getUsername())).thenReturn(false);
@@ -98,6 +118,10 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    /**
+     * Tests retrieving a user by ID when the user exists.
+     * Should return the user with matching ID.
+     */
     @Test
     void testGetUserById_Found() {
         when(userRepository.findById("1")).thenReturn(Optional.of(user1));
@@ -110,6 +134,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).findById("1");
     }
 
+    /**
+     * Tests retrieving a user by ID when the user does not exist.
+     * Should throw ResourceNotFoundException.
+     */
     @Test
     void testGetUserById_NotFound() {
         when(userRepository.findById("999")).thenReturn(Optional.empty());
@@ -122,6 +150,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).findById("999");
     }
 
+    /**
+     * Tests retrieving a user by username when the user exists.
+     * Should return the user with matching username.
+     */
     @Test
     void testGetUserByUsername_Found() {
         when(userRepository.findByUsername("johndoe")).thenReturn(Optional.of(user1));
@@ -134,6 +166,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).findByUsername("johndoe");
     }
 
+    /**
+     * Tests retrieving a user by username when the user does not exist.
+     * Should throw ResourceNotFoundException.
+     */
     @Test
     void testGetUserByUsername_NotFound() {
         when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
@@ -146,6 +182,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).findByUsername("unknown");
     }
 
+    /**
+     * Tests retrieving all users from the repository.
+     * Should return a list of all users.
+     */
     @Test
     void testGetAllUsers() {
         when(userRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
@@ -158,6 +198,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).findAll();
     }
 
+    /**
+     * Tests successfully updating an existing user.
+     * Should validate new username and email, encode new password, and save changes.
+     */
     @Test
     void testUpdateUser_Success() {
         User updatedUser = new User();
@@ -184,6 +228,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(any(User.class));
     }
 
+    /**
+     * Tests updating a user when the new username is already taken by another user.
+     * Should throw IllegalArgumentException and not save changes.
+     */
     @Test
     void testUpdateUser_UsernameAlreadyTaken() {
         User updatedUser = new User();
@@ -205,6 +253,10 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    /**
+     * Tests updating a user when the new email is already taken by another user.
+     * Should throw IllegalArgumentException and not save changes.
+     */
     @Test
     void testUpdateUser_EmailAlreadyTaken() {
         User updatedUser = new User();
@@ -226,6 +278,10 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    /**
+     * Tests updating a user while keeping the same username and email.
+     * Should skip username/email validation and update other fields without encoding empty password.
+     */
     @Test
     void testUpdateUser_SameUsernameAndEmail() {
         User updatedUser = new User();
@@ -249,6 +305,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(any(User.class));
     }
 
+    /**
+     * Tests successfully deleting an existing user.
+     * Should find and remove the user from the repository.
+     */
     @Test
     void testDeleteUser_Success() {
         when(userRepository.findById("1")).thenReturn(Optional.of(user1));
@@ -260,6 +320,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).delete(user1);
     }
 
+    /**
+     * Tests deleting a user that does not exist.
+     * Should throw ResourceNotFoundException and not attempt deletion.
+     */
     @Test
     void testDeleteUser_NotFound() {
         when(userRepository.findById("999")).thenReturn(Optional.empty());
@@ -273,6 +337,10 @@ class UserServiceTest {
         verify(userRepository, never()).delete(any(User.class));
     }
 
+    /**
+     * Tests getting or creating a user when the user already exists by ID.
+     * Should return the existing user without creating a new one.
+     */
     @Test
     void testGetOrCreateUser_UserExists() {
         when(userRepository.findById("1")).thenReturn(Optional.of(user1));
@@ -285,6 +353,10 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    /**
+     * Tests getting or creating a user when the user does not exist.
+     * Should create and save a new user with encoded password.
+     */
     @Test
     void testGetOrCreateUser_UserDoesNotExist_CreatesNew() {
         when(userRepository.findById("1")).thenReturn(Optional.empty());
@@ -301,6 +373,10 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(any(User.class));
     }
 
+    /**
+     * Tests getting or creating a user when the username exists under a different ID.
+     * Should return the existing user with that username.
+     */
     @Test
     void testGetOrCreateUser_UsernameExistsUnderDifferentId() {
         when(userRepository.findById("1")).thenReturn(Optional.empty());
@@ -317,6 +393,10 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    /**
+     * Tests getting or creating a user when username exists check returns true but user not found.
+     * Should throw ResourceNotFoundException due to data inconsistency.
+     */
     @Test
     void testGetOrCreateUser_UsernameExistsButNotFound() {
         when(userRepository.findById("1")).thenReturn(Optional.empty());
