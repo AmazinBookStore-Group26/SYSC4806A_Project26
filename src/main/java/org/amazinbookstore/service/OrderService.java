@@ -13,6 +13,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service responsible for order creation, retrieval, and updates.
+ *
+ * Handles:
+ *
+ *     Converting a user's shopping cart into a confirmed order
+ *     Validating inventory before order creation
+ *     Updating book inventory counts
+ *     Maintaining user purchase history
+ *     Basic CRUD operations on orders
+ */
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -22,6 +33,14 @@ public class OrderService {
     private final BookService bookService;
     private final UserRepository userRepository;
 
+    /**
+     * Creates an order based on the contents of a user's shopping cart.
+     *
+     * @param userId the ID of the user checking out
+     * @return the saved {@link Order}
+     * @throws IllegalStateException if the cart is empty
+     * @throws InsufficientInventoryException if any requested quantity exceeds inventory
+     */
     @Transactional
     public Order createOrderFromCart(String userId) {
         // Get user's cart
@@ -86,6 +105,13 @@ public class OrderService {
         return savedOrder;
     }
 
+    /**
+     * Updates the list of purchased book IDs for a user after an order is completed.
+     *
+     * @param userId     the user who placed the order
+     * @param orderItems the items included in the order
+     * @throws ResourceNotFoundException if the user does not exist
+     */
     private void updateUserPurchaseHistory(String userId, List<OrderItem> orderItems) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -99,19 +125,44 @@ public class OrderService {
         userRepository.save(user);
     }
 
+    /**
+     * Retrieves an order by its ID.
+     *
+     * @param orderId the ID of the order
+     * @return the matching {@link Order}
+     * @throws ResourceNotFoundException if the order cannot be found
+     */
     public Order getOrderById(String orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
     }
 
+    /**
+     * Retrieves all orders placed by a specific user, sorted by most recent first.
+     *
+     * @param userId the ID of the user
+     * @return list of the user's orders
+     */
     public List<Order> getOrdersByUserId(String userId) {
         return orderRepository.findByUserIdOrderByOrderDateDesc(userId);
     }
 
+    /**
+     * Retrieves every order in the system.
+     *
+     * @return list of all orders
+     */
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
+    /**
+     * Updates the status of an existing order.
+     *
+     * @param orderId the ID of the order
+     * @param status  the new status to apply
+     * @return the updated order
+     */
     public Order updateOrderStatus(String orderId, Order.OrderStatus status) {
         Order order = getOrderById(orderId);
         order.setStatus(status);

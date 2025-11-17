@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a completed purchase order within the Amazin Bookstore system.
+ * This entity is stored in the MongoDB orders collection.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
