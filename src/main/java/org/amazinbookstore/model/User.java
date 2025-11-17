@@ -17,6 +17,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "users")
+/**
+ * Represents a user account within the Amazin Bookstore system.
+ *
+ * A user contains identifying information, authentication credentials,
+ * and role-based permissions (CUSTOMER or OWNER). Users may also hold a list
+ * of purchased book IDs for historical record-keeping.
+ *
+ * Stored in the MongoDB users collection.
+ */
 public class User {
 
     @Id

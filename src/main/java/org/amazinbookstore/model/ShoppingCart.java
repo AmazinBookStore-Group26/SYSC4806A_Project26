@@ -15,7 +15,7 @@ import java.util.List;
  *
  * The cart is associated with a single user and contains a list of
  * @link CartItem objects. Each item represents a book added to the cart
- * along with its corresponding quantity.</p>
+ * along with its corresponding quantity.
  *
  * The cart provides helper methods for modifying cart contents:
  *  - Adding an item (incrementing quantity if it already exists
@@ -25,7 +25,6 @@ import java.util.List;
  * This class is persisted inside the shopping_carts collection
  * in MongoDB due to the @link Document annotation
  */
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -6,6 +6,12 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+/**
+ * Represents a single line item within an {@link Order}.
+ *
+ * Each item stores the book ID, title, purchased quantity,
+ * and the price at the time the order was created.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -12,27 +12,57 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+/**
+ * Handles authentication-related endpoints including login and user registration.
+ * <p>
+ * Provides views for login and registration pages, validates user input,
+ * and delegates creation of new user accounts to {@link UserService}.
+ */
 @Controller
 public class AuthController {
 
     private final UserService userService;
 
+    /**
+     * Constructs the authentication controller with a required {@link UserService}.
+     *
+     * @param userService service responsible for user creation and retrieval
+     */
     @Autowired
     public AuthController(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Displays the login page.
+     *
+     * @return the name of the Thymeleaf template for the login view
+     */
     @GetMapping("/login")
     public String loginPage() {
         return "login";
     }
 
+    /**
+     * Displays the registration page and initializes the form with a new DTO.
+     *
+     * @param model the UI model used to pass attributes to the view layer
+     * @return the registration page template
+     */
     @GetMapping("/register")
     public String registrationPage(Model model) {
         model.addAttribute("user", new UserRegistrationDTO());
         return "register";
     }
 
+    /**
+     * Handles user registration form submissions.
+     *
+     * @param registrationDTO form data submitted by the user
+     * @param result binding and validation results
+     * @param model the UI model for passing data back to the view layer
+     * @return redirect to login page upon success, or reload registration page on error
+     */
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute("user") UserRegistrationDTO registrationDTO,
                                BindingResult result,

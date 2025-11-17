@@ -26,7 +26,17 @@ public class ViewController {
     private final UserService userService;
     private final OrderService orderService;
 
-
+    /**
+     * Displays the homepage with support for search, genre filtering, and sorting.
+     *
+     * @param model     model for passing data to the view
+     * @param search    optional search query for title, author, or publisher
+     * @param genre     optional genre filter
+     * @param sortBy    sorting field (default: "title")
+     * @param order     sorting direction ("asc" or "desc")
+     * @param principal authenticated user information, or null if not logged in
+     * @return the "index" view
+     */
     @GetMapping("/")
     public String home(Model model,
                        @RequestParam(required = false) String search,
@@ -63,6 +73,12 @@ public class ViewController {
         return "index";
     }
 
+    /**
+     * Displays the admin panel containing book management tools.
+     *
+     * @param model model for passing book data
+     * @return the "admin" view
+     */
     @GetMapping("/admin")
     public String adminPanel(Model model) {
         List<Book> books = bookService.getAllBooks();
@@ -71,6 +87,13 @@ public class ViewController {
         return "admin";
     }
 
+    /**
+     * Displays the edit form for a specific book.
+     *
+     * @param id    the book ID
+     * @param model model containing the selected book
+     * @return the "edit-book" view
+     */
     @GetMapping("/admin/book/edit/{id}")
     public String editBookForm(@PathVariable String id, Model model) {
         Book book = bookService.getBookById(id);
@@ -78,7 +101,13 @@ public class ViewController {
         return "edit-book";
     }
 
-
+    /**
+     * Displays the user's shopping cart.
+     *
+     * @param principal authenticated user information
+     * @param model     model containing cart items and totals
+     * @return the "cart" view
+     */
     @GetMapping("/cart")
     public String viewCart(Principal principal, Model model) {
         User user = getCurrentUser(principal);
@@ -114,8 +143,13 @@ public class ViewController {
         return "cart";
     }
 
-
-    // Helper method to get the currently authenticated user
+    /**
+     * Retrieves the currently authenticated {@link User}.
+     *
+     * @param principal security principal containing the username
+     * @return the authenticated user
+     * @throws IllegalStateException if no user is logged in
+     */
     private User getCurrentUser(Principal principal) {
         if (principal == null) {
             throw new IllegalStateException("User must be logged in");
@@ -123,6 +157,14 @@ public class ViewController {
         return userService.getUserByUsername(principal.getName());
     }
 
+    /**
+     * Displays the details page for a single book.
+     *
+     * @param id        the book ID
+     * @param model     model containing book information
+     * @param principal authenticated user information
+     * @return the "book-details" view
+     */
     @GetMapping("/book/{id}")
     public String bookDetails(@PathVariable String id, Model model, Principal principal) {
         Book book = bookService.getBookById(id);
@@ -137,6 +179,13 @@ public class ViewController {
         return "book-details";
     }
 
+    /**
+     * Displays the authenticated user's order history.
+     *
+     * @param principal authenticated user info
+     * @param model     model containing order data
+     * @return the "orders" view
+     */
     @GetMapping("/orders")
     public String viewOrders(Principal principal, Model model) {
         User user = getCurrentUser(principal);
