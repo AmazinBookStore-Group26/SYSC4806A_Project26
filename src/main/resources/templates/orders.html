@@ -18,6 +18,7 @@
           <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
           <a href="/orders" sec:authorize="isAuthenticated()">My Orders</a>
           <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+          <a href="/recommendations" sec:authorize="isAuthenticated()">Recommendations</a>
           <span sec:authorize="isAuthenticated()">
             Welcome, <span sec:authentication="name"></span> |
             <form th:action="@{/logout}" method="post" style="display: inline">

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amazin Bookstore - Home</title>
+    <title>Recommendations - Amazin Bookstore</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -15,12 +15,12 @@
             <a href="/">Home</a>
             <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
             <a href="/orders" sec:authorize="isAuthenticated()">My Orders</a>
-            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
             <a href="/recommendations" sec:authorize="isAuthenticated()">Recommendations</a>
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
             <span sec:authorize="isAuthenticated()">
                     Welcome, <span sec:authentication="name"></span> |
                     <form th:action="@{/logout}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-link">Logout</button>
+                          <button type="submit" class="btn-link">Logout</button>
                     </form>
                 </span>
             <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
@@ -28,30 +28,17 @@
     </header>
 
     <main>
-        <h2 class="page-title">Browse Books</h2>
+        <h2 class="page-title">Recommended for You</h2>
 
-        <div class="search-section">
-            <form class="search-form" method="get" action="/">
-                <input type="text" name="search" placeholder="Search by title, author, or publisher..."
-                       th:value="${currentSearch}">
-                <select name="sortBy">
-                    <option value="title">Sort by Title</option>
-                    <option value="author">Sort by Author</option>
-                    <option value="price">Sort by Price</option>
-                    <option value="publicationyear">Sort by Year</option>
-                </select>
-                <select name="order">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                </select>
-                <button type="submit" class="btn">Search</button>
-                <a href="/" class="btn btn-secondary">Clear</a>
-            </form>
+        <div class="alert alert-info">
+            <strong>How it works:</strong> We use the Jaccard distance algorithm to find users with similar
+            purchase history and recommend books they enjoyed that you haven't read yet!
         </div>
 
         <div th:if="${books.isEmpty()}" class="empty-state">
-            <h3>No books found</h3>
-            <p>Try adjusting your search or filters</p>
+            <h3>No recommendations available</h3>
+            <p>Purchase some books to get personalized recommendations based on your taste!</p>
+            <a href="/" class="btn">Browse Books</a>
         </div>
 
         <div class="book-grid">
@@ -63,7 +50,6 @@
                      class="book-image">
                 <div th:unless="${book.pictureUrl != null and !book.pictureUrl.isEmpty()}"
                      class="book-image-placeholder">
-                    📚
                 </div>
 
                 <!-- Book Content -->
@@ -83,10 +69,6 @@
     </main>
 </div>
 
-<script th:if="${userId != null}">
-    // Set the userId in localStorage for the cart functionality
-    localStorage.setItem('userId', '[[${userId}]]');
-</script>
 <script th:src="@{/js/script.js}"></script>
 </body>
 </html>
