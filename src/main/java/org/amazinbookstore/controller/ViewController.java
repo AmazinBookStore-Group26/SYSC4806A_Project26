@@ -7,6 +7,7 @@ import org.amazinbookstore.model.ShoppingCart;
 import org.amazinbookstore.model.User;
 import org.amazinbookstore.service.BookService;
 import org.amazinbookstore.service.OrderService;
+import org.amazinbookstore.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.amazinbookstore.service.ShoppingCartService;
 import org.amazinbookstore.service.UserService;
@@ -25,6 +26,7 @@ public class ViewController {
     private final ShoppingCartService shoppingCartService;
     private final UserService userService;
     private final OrderService orderService;
+    private final RecommendationService recommendationService;
 
     /**
      * Displays the homepage with support for search, genre filtering, and sorting.
@@ -194,5 +196,19 @@ public class ViewController {
         model.addAttribute("orders", orders);
         model.addAttribute("userId", userId);
         return "orders";
+    }
+
+    @GetMapping("/recommendations")
+    public String viewRecommendations(Principal principal, Model model) {
+        User user = getCurrentUser(principal);
+        String userId = user.getId();
+        List<Book> recommendations = new ArrayList<>();
+        try {
+            recommendations = recommendationService.getRecommendations(userId, 10);
+        } catch (Exception e) {
+        }
+        model.addAttribute("books", recommendations);
+        model.addAttribute("userId", userId);
+        return "recommendations";
     }
 }
