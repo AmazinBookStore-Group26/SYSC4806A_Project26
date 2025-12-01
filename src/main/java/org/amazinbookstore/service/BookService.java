@@ -4,6 +4,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.amazinbookstore.model.Book;
 import org.amazinbookstore.repository.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -116,5 +120,31 @@ public class BookService {
         Book book = getBookById(bookId);
         book.setInventory(book.getInventory() - quantity);
         bookRepository.save(book);
+    }
+
+    /**
+     * Search books with pagination support
+     * Returns a Page object containing books and pagination metadata
+     */
+    public Page<Book> searchBooksPaginated(String author, String publisher, String genre,
+                                            String title, String sortBy, int page, int size) {
+        // Get all matching books first
+        List<Book> allBooks = searchBooks(author, publisher, genre, title, sortBy);
+
+        // Calculate pagination
+        int totalElements = allBooks.size();
+        int start = page * size;
+        int end = Math.min(start + size, totalElements);
+
+        // Handle edge case where page is beyond available data
+        if (start >= totalElements) {
+            start = 0;
+            end = Math.min(size, totalElements);
+        }
+
+        List<Book> pageContent = allBooks.subList(start, end);
+        Pageable pageable = PageRequest.of(page, size);
+
+        return new PageImpl<>(pageContent, pageable, totalElements);
     }
 }
