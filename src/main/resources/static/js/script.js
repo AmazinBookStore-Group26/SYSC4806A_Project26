@@ -140,6 +140,59 @@ function addToCart(bookId, quantity) {
     });
 }
 
+// Quick add to cart from browse page (adds 1 item)
+function quickAddToCart(bookId) {
+  const url = `/api/cart/${DEFAULT_USER_ID}/items`;
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      bookId: bookId,
+      quantity: 1,
+    }),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      return response.json().then((err) => Promise.reject(err));
+    })
+    .then((data) => {
+      // Show success feedback
+      showNotification("Added to cart!", "success");
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      showNotification(error.message || "Failed to add to cart", "error");
+    });
+}
+
+// Show notification toast
+function showNotification(message, type) {
+  // Remove existing notification if any
+  const existing = document.querySelector(".notification-toast");
+  if (existing) {
+    existing.remove();
+  }
+
+  const toast = document.createElement("div");
+  toast.className = `notification-toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // Trigger animation
+  setTimeout(() => toast.classList.add("show"), 10);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 // Remove from cart function
 function removeFromCart(bookId) {
   if (!confirm("Are you sure you want to remove this item from cart?")) {
@@ -278,4 +331,144 @@ function processCheckout(event) {
           "Failed to process checkout. Please check inventory availability."
       );
     });
+}
+
+// ======= Book Filtering and Sorting (Recommendations Page) =======
+
+/**
+ * Initialize recommendation page filters
+ * Populates genre dropdown with unique genres from displayed books
+ */
+function initRecommendationFilters() {
+  const genreSelect = document.getElementById("genreFilter");
+  if (!genreSelect) return;
+
+  const books = document.querySelectorAll(".book-card");
+  const genres = new Set();
+
+  books.forEach((book) => {
+    const genre = book.dataset.genre;
+    if (genre && genre.trim() !== "") {
+      genres.add(genre);
+    }
+  });
+
+  // add genres to dropdown
+  Array.from(genres)
+    .sort()
+    .forEach((genre) => {
+      const option = document.createElement("option");
+      option.value = genre;
+      option.textContent = genre;
+      genreSelect.appendChild(option);
+    });
+}
+
+/**
+ * Filter books by genre
+ */
+function filterBooks() {
+  const genreSelect = document.getElementById("genreFilter");
+  if (!genreSelect) return;
+
+  const genreFilter = genreSelect.value.toLowerCase();
+  const books = document.querySelectorAll(".book-card");
+  const bookGrid = document.getElementById("bookGrid");
+  const noResults = document.getElementById("noResults");
+  let visibleCount = 0;
+
+  books.forEach((book) => {
+    const genre = (book.dataset.genre || "").toLowerCase();
+    const matchesGenre = !genreFilter || genre === genreFilter;
+
+    if (matchesGenre) {
+      book.style.display = "";
+      visibleCount++;
+    } else {
+      book.style.display = "none";
+    }
+  });
+
+  // show/hide no results message
+  if (noResults) {
+    noResults.style.display = visibleCount === 0 ? "block" : "none";
+  }
+  if (bookGrid) {
+    bookGrid.style.display = visibleCount === 0 ? "none" : "grid";
+  }
+}
+
+/**
+ * Sort books by selected criteria
+ */
+function sortBooks() {
+  const sortSelect = document.getElementById("sortBy");
+  if (!sortSelect) return;
+
+  const sortBy = sortSelect.value;
+  const grid = document.getElementById("bookGrid");
+  if (!grid) return;
+
+  const books = Array.from(grid.querySelectorAll(".book-card"));
+
+  books.sort((a, b) => {
+    switch (sortBy) {
+      case "title":
+        return (a.dataset.title || "").localeCompare(b.dataset.title || "");
+      case "title-desc":
+        return (b.dataset.title || "").localeCompare(a.dataset.title || "");
+      case "price":
+        return parseFloat(a.dataset.price || 0) - parseFloat(b.dataset.price || 0);
+      case "price-desc":
+        return parseFloat(b.dataset.price || 0) - parseFloat(a.dataset.price || 0);
+      case "author":
+        return (a.dataset.author || "").localeCompare(b.dataset.author || "");
+      default:
+        return 0;
+    }
+  });
+
+  // re-append in sorted order
+  books.forEach((book) => grid.appendChild(book));
+}
+
+/**
+ * Reset all filters and reload page
+ */
+function resetFilters() {
+  const genreSelect = document.getElementById("genreFilter");
+  const sortSelect = document.getElementById("sortBy");
+
+  if (genreSelect) genreSelect.value = "";
+  if (sortSelect) sortSelect.value = "default";
+
+  // reload to get original order
+  location.reload();
+}
+
+// Initialize filters when DOM is ready
+document.addEventListener("DOMContentLoaded", function () {
+  initRecommendationFilters();
+});
+
+// Quantity selector functions for book details page
+function increaseQty() {
+  const input = document.getElementById("quantity");
+  if (input) {
+    const max = parseInt(input.getAttribute("max")) || 999;
+    const current = parseInt(input.value) || 1;
+    if (current < max) {
+      input.value = current + 1;
+    }
+  }
+}
+
+function decreaseQty() {
+  const input = document.getElementById("quantity");
+  if (input) {
+    const current = parseInt(input.value) || 1;
+    if (current > 1) {
+      input.value = current - 1;
+    }
+  }
 }

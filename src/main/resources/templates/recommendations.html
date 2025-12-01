@@ -8,7 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="container">
+<div class="container full-width">
     <header>
         <h1>Amazin Bookstore</h1>
         <nav>
@@ -30,9 +30,39 @@
     <main>
         <h2 class="page-title">Recommended for You</h2>
 
-        <div class="alert alert-info">
-            <strong>How it works:</strong> We find users with similar
-            purchase history and recommend books they enjoyed that you haven't read yet!
+        <!-- Show the appropriate message based on whether it's personalized or fallback -->
+        <div th:if="${isFallback}" class="alert alert-warning">
+            <strong th:text="${message}">We couldn't find readers with similar taste, here are some popular books</strong>
+        </div>
+        <div th:unless="${isFallback}" class="alert alert-info">
+            <span th:if="${not books.isEmpty()}" th:text="${message}">Based on your reading history</span>
+            <span th:if="${books.isEmpty()}">
+                <strong>How it works:</strong> We find users with similar purchase history and recommend books they enjoyed that you haven't read yet!
+            </span>
+        </div>
+
+        <!-- Filter and sort section -->
+        <div th:if="${not books.isEmpty()}" class="search-section">
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="genreFilter">Filter by Genre:</label>
+                    <select id="genreFilter" onchange="filterBooks()">
+                        <option value="">All Genres</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sortBy">Sort by:</label>
+                    <select id="sortBy" onchange="sortBooks()">
+                        <option value="default">Default</option>
+                        <option value="title">Title (A-Z)</option>
+                        <option value="title-desc">Title (Z-A)</option>
+                        <option value="price">Price (Low to High)</option>
+                        <option value="price-desc">Price (High to Low)</option>
+                        <option value="author">Author (A-Z)</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+            </div>
         </div>
 
         <div th:if="${books.isEmpty()}" class="empty-state">
@@ -41,8 +71,12 @@
             <a href="/" class="btn">Browse Books</a>
         </div>
 
-        <div class="book-grid">
-            <div th:each="book : ${books}" class="book-card">
+        <div class="book-grid" id="bookGrid">
+            <div th:each="book : ${books}" class="book-card"
+                 th:data-title="${book.title}"
+                 th:data-author="${book.author}"
+                 th:data-price="${book.price}"
+                 th:data-genre="${book.genre}">
                 <!-- Book Image -->
                 <img th:if="${book.pictureUrl != null and !book.pictureUrl.isEmpty()}"
                      th:src="${book.pictureUrl}"
@@ -65,6 +99,12 @@
                     <a th:href="@{/book/{id}(id=${book.id})}" class="btn">View Details</a>
                 </div>
             </div>
+        </div>
+
+        <div id="noResults" class="empty-state" style="display: none;">
+            <h3>No books match your filters</h3>
+            <p>Try adjusting your filter criteria</p>
+            <button class="btn" onclick="resetFilters()">Reset Filters</button>
         </div>
     </main>
 </div>

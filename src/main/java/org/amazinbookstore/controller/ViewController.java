@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,14 +30,18 @@ public class ViewController {
     private final OrderService orderService;
     private final RecommendationService recommendationService;
 
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
     /**
-     * Displays the homepage with support for search, genre filtering, and sorting.
+     * Displays the homepage with support for search, genre filtering, sorting, and pagination.
      *
      * @param model     model for passing data to the view
      * @param search    optional search query for title, author, or publisher
      * @param genre     optional genre filter
      * @param sortBy    sorting field (default: "title")
      * @param order     sorting direction ("asc" or "desc")
+     * @param page      page number (0-indexed, default: 0)
+     * @param size      number of books per page (default: 10)
      * @param principal authenticated user information, or null if not logged in
      * @return the "index" view
      */
@@ -45,8 +51,9 @@ public class ViewController {
                        @RequestParam(required = false) String genre,
                        @RequestParam(required = false, defaultValue = "title") String sortBy,
                        @RequestParam(required = false, defaultValue = "asc") String order,
+                       @RequestParam(required = false, defaultValue = "0") int page,
+                       @RequestParam(required = false, defaultValue = "10") int size,
                        Principal principal) {
-        List<Book> books;
 
         String sortParam = sortBy;
         if (order != null && order.equalsIgnoreCase("desc") &&
@@ -54,17 +61,30 @@ public class ViewController {
             sortParam = sortBy + "_desc";
         }
 
+        Page<Book> bookPage;
         if (search != null && !search.trim().isEmpty()) {
-            books = bookService.searchBooks(null, null, null, search, sortParam);
+            bookPage = bookService.searchBooksPaginated(null, null, null, search, sortParam, page, size);
         } else if (genre != null && !genre.trim().isEmpty()) {
-            books = bookService.searchBooks(null, null, genre, null, sortParam);
+            bookPage = bookService.searchBooksPaginated(null, null, genre, null, sortParam, page, size);
         } else {
-            books = bookService.searchBooks(null, null, null, null, sortParam);
+            bookPage = bookService.searchBooksPaginated(null, null, null, null, sortParam, page, size);
         }
 
-        model.addAttribute("books", books);
+        model.addAttribute("books", bookPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", bookPage.getTotalPages());
+        model.addAttribute("totalItems", bookPage.getTotalElements());
+        model.addAttribute("pageSize", size);
         model.addAttribute("currentSearch", search);
         model.addAttribute("currentGenre", genre);
+        model.addAttribute("currentSortBy", sortBy);
+        model.addAttribute("currentOrder", order);
+
+        // Calculate display range for "Showing X-Y of Z"
+        long startItem = page * size + 1;
+        long endItem = Math.min((long)(page + 1) * size, bookPage.getTotalElements());
+        model.addAttribute("startItem", startItem);
+        model.addAttribute("endItem", endItem);
 
         // Add userId for authenticated users
         if (principal != null) {
@@ -203,12 +223,19 @@ public class ViewController {
         User user = getCurrentUser(principal);
         String userId = user.getId();
         List<Book> recommendations = new ArrayList<>();
+        String message = "";
+        boolean isFallback = false;
         try {
-            recommendations = recommendationService.getRecommendations(userId, 10);
+            var response = recommendationService.getRecommendations(userId, 10);
+            recommendations = response.getBooks();
+            message = response.getMessage();
+            isFallback = response.isFallback();
         } catch (Exception e) {
         }
         model.addAttribute("books", recommendations);
         model.addAttribute("userId", userId);
+        model.addAttribute("message", message);
+        model.addAttribute("isFallback", isFallback);
         return "recommendations";
     }
 }

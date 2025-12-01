@@ -8,15 +8,16 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="container">
+<div class="container full-width">
     <header>
         <h1>Amazin Bookstore</h1>
         <nav>
             <a href="/">Home</a>
             <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
             <a href="/orders" sec:authorize="isAuthenticated()">My Orders</a>
-            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
             <a href="/recommendations" sec:authorize="isAuthenticated()">Recommendations</a>
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+
             <span sec:authorize="isAuthenticated()">
                     Welcome, <span sec:authentication="name"></span> |
                     <form th:action="@{/logout}" method="post" style="display: inline;">
@@ -35,18 +36,24 @@
                 <input type="text" name="search" placeholder="Search by title, author, or publisher..."
                        th:value="${currentSearch}">
                 <select name="sortBy">
-                    <option value="title">Sort by Title</option>
-                    <option value="author">Sort by Author</option>
-                    <option value="price">Sort by Price</option>
-                    <option value="publicationyear">Sort by Year</option>
+                    <option value="title" th:selected="${currentSortBy == 'title'}">Sort by Title</option>
+                    <option value="author" th:selected="${currentSortBy == 'author'}">Sort by Author</option>
+                    <option value="price" th:selected="${currentSortBy == 'price'}">Sort by Price</option>
+                    <option value="year" th:selected="${currentSortBy == 'year'}">Sort by Year</option>
                 </select>
                 <select name="order">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
+                    <option value="asc" th:selected="${currentOrder == 'asc'}">Ascending</option>
+                    <option value="desc" th:selected="${currentOrder == 'desc'}">Descending</option>
                 </select>
                 <button type="submit" class="btn">Search</button>
                 <a href="/" class="btn btn-secondary">Clear</a>
             </form>
+        </div>
+
+        <!-- Results info -->
+        <div th:if="${totalItems > 0}" class="results-info">
+            Showing <span th:text="${startItem}">1</span>-<span th:text="${endItem}">10</span>
+            of <span th:text="${totalItems}">100</span> books
         </div>
 
         <div th:if="${books.isEmpty()}" class="empty-state">
@@ -63,7 +70,6 @@
                      class="book-image">
                 <div th:unless="${book.pictureUrl != null and !book.pictureUrl.isEmpty()}"
                      class="book-image-placeholder">
-                    📚
                 </div>
 
                 <!-- Book Content -->
@@ -76,9 +82,59 @@
                         <span th:if="${book.inventory > 0}" th:text="${book.inventory} + ' in stock'">10 in stock</span>
                         <span th:if="${book.inventory == 0}" style="color: #8B4545;">Out of stock</span>
                     </div>
-                    <a th:href="@{/book/{id}(id=${book.id})}" class="btn">View Details</a>
+                    <div class="book-card-actions">
+                        <a th:href="@{/book/{id}(id=${book.id})}" class="btn btn-secondary">View Details</a>
+                        <button th:if="${book.inventory > 0}"
+                                class="btn btn-success quick-add-btn"
+                                th:data-book-id="${book.id}"
+                                onclick="quickAddToCart(this.getAttribute('data-book-id'))"
+                                sec:authorize="isAuthenticated()">
+                            Add to Cart
+                        </button>
+                        <a th:if="${book.inventory > 0}"
+                           href="/login"
+                           class="btn btn-success"
+                           sec:authorize="!isAuthenticated()">
+                            Login to Buy
+                        </a>
+                        <button th:if="${book.inventory == 0}"
+                                class="btn"
+                                disabled
+                                style="opacity: 0.5; cursor: not-allowed;">
+                            Out of Stock
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Pagination -->
+        <div th:if="${totalPages > 1}" class="pagination">
+            <a th:if="${currentPage > 0}"
+               th:href="@{/(search=${currentSearch}, sortBy=${currentSortBy}, order=${currentOrder}, page=${currentPage - 1}, size=${pageSize})}"
+               class="pagination-btn">
+                &laquo; Previous
+            </a>
+            <span th:if="${currentPage == 0}" class="pagination-btn disabled">&laquo; Previous</span>
+
+            <div class="pagination-numbers">
+                <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:if="${i != currentPage}"
+                       th:href="@{/(search=${currentSearch}, sortBy=${currentSortBy}, order=${currentOrder}, page=${i}, size=${pageSize})}"
+                       th:text="${i + 1}"
+                       class="pagination-num">1</a>
+                    <span th:if="${i == currentPage}"
+                          th:text="${i + 1}"
+                          class="pagination-num active">1</span>
+                </th:block>
+            </div>
+
+            <a th:if="${currentPage < totalPages - 1}"
+               th:href="@{/(search=${currentSearch}, sortBy=${currentSortBy}, order=${currentOrder}, page=${currentPage + 1}, size=${pageSize})}"
+               class="pagination-btn">
+                Next &raquo;
+            </a>
+            <span th:if="${currentPage >= totalPages - 1}" class="pagination-btn disabled">Next &raquo;</span>
         </div>
     </main>
 </div>

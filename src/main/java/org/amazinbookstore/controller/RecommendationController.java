@@ -1,12 +1,10 @@
 package org.amazinbookstore.controller;
 
-import org.amazinbookstore.model.Book;
+import org.amazinbookstore.dto.RecommendationResponse;
 import org.amazinbookstore.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/recommendations")
@@ -17,17 +15,16 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     /**
-     * Endpoint for getting recommended books for a user
-     * @param userId ID of current user
-     * @param limit max amount of recommended books
-     * @return recommended books
+     * Get recommended books for a user.
+     * Returns personalized recommendations if we find similar users,
+     * otherwise falls back to popular books with a message explaining that.
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Book>> getRecommendations(
+    public ResponseEntity<RecommendationResponse> getRecommendations(
             @PathVariable String userId,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        List<Book> recommendations = recommendationService.getRecommendations(userId, limit);
-        return ResponseEntity.ok(recommendations);
+        RecommendationResponse response = recommendationService.getRecommendations(userId, limit);
+        return ResponseEntity.ok(response);
     }
 }

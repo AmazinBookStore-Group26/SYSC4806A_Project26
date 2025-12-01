@@ -1,5 +1,6 @@
 package org.amazinbookstore.controller;
 
+import org.amazinbookstore.dto.RecommendationResponse;
 import org.amazinbookstore.exception.ResourceNotFoundException;
 import org.amazinbookstore.model.Book;
 import org.amazinbookstore.service.RecommendationService;
@@ -10,16 +11,14 @@ import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
  * Tests for the recommendations API endpoint.
- * just making sure the controller passes requests
- * to the service correctly and returns proper responses.
+ * Making sure the controller passes requests to the service
+ * and returns proper responses with fallback info.
  */
 class RecommendationControllerTest {
 
@@ -41,41 +40,55 @@ class RecommendationControllerTest {
     }
 
     @Test
-    void shouldReturnRecommendationsForHasib() {
-        // Hasib exists and has some recommendations
-        when(recommendationService.getRecommendations("hasib", 10))
-                .thenReturn(Arrays.asList(book1, book2));
+    void shouldReturnPersonalizedRecommendationsForHasib() {
+        // Hasib has similar users, so we get personalized recs
+        RecommendationResponse serviceResponse = RecommendationResponse.personalized(Arrays.asList(book1, book2));
+        when(recommendationService.getRecommendations("hasib", 10)).thenReturn(serviceResponse);
 
-        ResponseEntity<List<Book>> response = recommendationController.getRecommendations("hasib", 10);
+        ResponseEntity<RecommendationResponse> response = recommendationController.getRecommendations("hasib", 10);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().size());
+        assertEquals(2, response.getBody().getBooks().size());
+        assertFalse(response.getBody().isFallback());
         verify(recommendationService, times(1)).getRecommendations("hasib", 10);
     }
 
     @Test
-    void shouldReturnEmptyListWhenNoRecommendations() {
-        // Hajar exists but no recommendations available
-        when(recommendationService.getRecommendations("hajar", 10))
-                .thenReturn(Collections.emptyList());
+    void shouldReturnFallbackRecommendationsWithMessage() {
+        // Hajar has unique taste so we fall back to popular books
+        RecommendationResponse serviceResponse = RecommendationResponse.fallbackToPopular(Arrays.asList(book1));
+        when(recommendationService.getRecommendations("hajar", 10)).thenReturn(serviceResponse);
 
-        ResponseEntity<List<Book>> response = recommendationController.getRecommendations("hajar", 10);
+        ResponseEntity<RecommendationResponse> response = recommendationController.getRecommendations("hajar", 10);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
+        assertTrue(response.getBody().isFallback());
+        assertTrue(response.getBody().getMessage().contains("couldn't find"));
+    }
+
+    @Test
+    void shouldReturnEmptyResponseWhenNoBooksAvailable() {
+        // no books to recommend at all
+        RecommendationResponse serviceResponse = RecommendationResponse.empty();
+        when(recommendationService.getRecommendations("yusuf", 10)).thenReturn(serviceResponse);
+
+        ResponseEntity<RecommendationResponse> response = recommendationController.getRecommendations("yusuf", 10);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().getBooks().isEmpty());
     }
 
     @Test
     void shouldUseCustomLimit() {
-        // check that the limit param actually gets passed through
-        when(recommendationService.getRecommendations("hasib", 5))
-                .thenReturn(Arrays.asList(book1));
-        ResponseEntity<List<Book>> response = recommendationController.getRecommendations("hasib", 5);
+        // check that the limit param gets passed through
+        RecommendationResponse serviceResponse = RecommendationResponse.personalized(Arrays.asList(book1));
+        when(recommendationService.getRecommendations("hasib", 5)).thenReturn(serviceResponse);
+
+        ResponseEntity<RecommendationResponse> response = recommendationController.getRecommendations("hasib", 5);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // make sure we called with the right limit
         verify(recommendationService, times(1)).getRecommendations("hasib", 5);
     }
 
@@ -91,29 +104,14 @@ class RecommendationControllerTest {
     }
 
     @Test
-    void shouldReturnSingleRecommendation() {
-        // just one book to recommend to Yusuf
-        when(recommendationService.getRecommendations("yusuf", 10))
-                .thenReturn(Arrays.asList(book1));
+    void shouldIncludeMessageInResponse() {
+        // make sure the message field is populated for UI to display
+        RecommendationResponse serviceResponse = RecommendationResponse.personalized(Arrays.asList(book1));
+        when(recommendationService.getRecommendations("hasib", 10)).thenReturn(serviceResponse);
 
-        ResponseEntity<List<Book>> response = recommendationController.getRecommendations("yusuf", 10);
+        ResponseEntity<RecommendationResponse> response = recommendationController.getRecommendations("hasib", 10);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
-        assertEquals("The Great Gatsby", response.getBody().get(0).getTitle());
-    }
-
-    @Test
-    void shouldWorkWithLargeLimit() {
-        // Hajar asking for lots of recommendations
-        when(recommendationService.getRecommendations("hajar", 100))
-                .thenReturn(Arrays.asList(book1, book2));
-
-        ResponseEntity<List<Book>> response = recommendationController.getRecommendations("hajar", 100);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        // even with high limit, we only get what's available
-        assertEquals(2, response.getBody().size());
-        verify(recommendationService).getRecommendations("hajar", 100);
+        assertNotNull(response.getBody().getMessage());
+        assertFalse(response.getBody().getMessage().isEmpty());
     }
 }

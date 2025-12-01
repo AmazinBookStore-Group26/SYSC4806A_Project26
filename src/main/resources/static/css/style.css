@@ -29,6 +29,69 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+.container.full-width {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--background-cream);
+}
+
+.container.full-width main {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 50px;
+    background: var(--background-light);
+    min-height: calc(100vh - 150px);
+}
+
+.container.full-width .page-title {
+    font-family: 'Georgia', serif;
+    font-size: 2.5em;
+    color: var(--primary-dark);
+    margin-bottom: 30px;
+    font-weight: normal;
+}
+
+/* Auth container within full-width layout */
+.container.full-width .auth-container {
+    max-width: 480px;
+    margin: 60px auto;
+    padding: 50px;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 40px var(--shadow-light);
+}
+
+/* Admin section improvements for full-width */
+.container.full-width .admin-section {
+    max-width: 1200px;
+}
+
+/* Cart table improvements for full-width */
+.container.full-width .cart-table {
+    max-width: 100%;
+}
+
+/* Book details container for full-width */
+.container.full-width .book-details-container {
+    max-width: 1200px;
+}
+
+/* Order cards for full-width */
+.container.full-width .order-card {
+    max-width: 1000px;
+}
+
+@media (max-width: 768px) {
+    .container.full-width main {
+        padding: 20px 15px;
+    }
+}
+
 /* ======= Headings ======= */
 header {
     background: var(--primary-dark);
@@ -583,6 +646,100 @@ select {
 .success-message { color: green; }
 .error-message { color: red; }
 
+/* ======= Alerts ======= */
+.alert {
+    padding: 20px 25px;
+    border-radius: 3px;
+    margin-bottom: 25px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.alert-info {
+    background: var(--background-cream);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-gold);
+    color: var(--text-dark);
+}
+
+.alert-warning {
+    background: #FFF8E1;
+    border: 1px solid #FFE082;
+    border-left: 4px solid #FFA000;
+    color: #5D4037;
+}
+
+.alert-success {
+    background: #E8F5E9;
+    border: 1px solid #A5D6A7;
+    border-left: 4px solid #4CAF50;
+    color: #2E7D32;
+}
+
+.alert strong {
+    font-weight: 600;
+}
+
+/* ======= Filter Controls ======= */
+.filter-controls {
+    display: flex;
+    gap: 25px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.9em;
+    color: var(--text-medium);
+    font-weight: 500;
+}
+
+.filter-group select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    background: var(--background-light);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.95em;
+    color: var(--text-dark);
+    min-width: 180px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-group select:hover {
+    border-color: var(--accent-gold);
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    background: var(--background-cream);
+}
+
+@media (max-width: 768px) {
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .filter-group select {
+        width: 100%;
+    }
+
+    .container.full-width main {
+        padding: 30px 20px;
+    }
+}
+
 /* ======= Modal ======= */
 .modal {
     position: fixed;
@@ -760,6 +917,309 @@ select {
     }
 
     .cart-actions {
+        flex-direction: column;
+    }
+}
+
+/* ======= Pagination ======= */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 40px;
+    padding: 20px 0;
+}
+
+.pagination-btn {
+    padding: 10px 20px;
+    background: var(--primary-brown);
+    color: var(--background-cream);
+    text-decoration: none;
+    border-radius: 3px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+}
+
+.pagination-btn:hover {
+    background: var(--primary-dark);
+}
+
+.pagination-btn.disabled {
+    background: var(--border-color);
+    color: var(--text-light);
+    cursor: not-allowed;
+}
+
+.pagination-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination-num {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    color: var(--text-dark);
+    text-decoration: none;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    transition: all 0.3s ease;
+}
+
+.pagination-num:hover {
+    border-color: var(--accent-gold);
+    background: var(--background-cream);
+}
+
+.pagination-num.active {
+    background: var(--primary-brown);
+    color: var(--background-cream);
+    border-color: var(--primary-brown);
+}
+
+.results-info {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    color: var(--text-medium);
+    font-size: 0.95em;
+    margin-bottom: 20px;
+}
+
+/* ======= Book Card Actions ======= */
+.book-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.book-card-actions .btn {
+    flex: 1;
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 0.9em;
+}
+
+.quick-add-btn {
+    white-space: nowrap;
+}
+
+/* ======= Notification Toast ======= */
+.notification-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    border-radius: 5px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.95em;
+    z-index: 9999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.notification-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.notification-toast.success {
+    background: #2E7D32;
+    color: white;
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+}
+
+.notification-toast.error {
+    background: #C62828;
+    color: white;
+    box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
+}
+
+/* ======= Enhanced Book Details Page ======= */
+.book-price-large {
+    font-family: 'Georgia', serif;
+    font-size: 2.5em;
+    color: var(--accent-gold);
+    margin: 20px 0;
+}
+
+.stock-badge-container {
+    margin-bottom: 25px;
+}
+
+.stock-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 3px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.stock-badge.in-stock {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.stock-badge.low-stock {
+    background: #FFF3E0;
+    color: #E65100;
+}
+
+.stock-badge.out-of-stock {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.book-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 25px;
+    background: var(--background-cream);
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.detail-label {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.85em;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-value {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 1em;
+    color: var(--text-dark);
+}
+
+.book-description-section {
+    margin-bottom: 30px;
+}
+
+.book-description-section h3 {
+    font-family: 'Georgia', serif;
+    font-size: 1.3em;
+    color: var(--primary-dark);
+    margin-bottom: 15px;
+    font-weight: normal;
+}
+
+.book-description-section p {
+    font-family: 'Georgia', serif;
+    font-size: 1em;
+    line-height: 1.8;
+    color: var(--text-medium);
+}
+
+.add-to-cart-section {
+    padding-top: 25px;
+    border-top: 1px solid var(--border-color);
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.quantity-selector label {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.quantity-input-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+}
+
+.qty-btn {
+    width: 40px;
+    height: 40px;
+    background: var(--background-cream);
+    border: none;
+    font-size: 1.2em;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.qty-btn:hover {
+    background: var(--border-color);
+}
+
+.quantity-input-wrapper input {
+    width: 60px;
+    height: 40px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 1em;
+}
+
+.quantity-input-wrapper input:focus {
+    outline: none;
+}
+
+.btn-large {
+    padding: 15px 40px;
+    font-size: 1.1em;
+}
+
+.login-prompt {
+    text-align: center;
+}
+
+.login-prompt p {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    color: var(--text-medium);
+    margin-bottom: 15px;
+}
+
+.out-of-stock-message {
+    text-align: center;
+}
+
+.out-of-stock-message p {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    color: var(--text-light);
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .book-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+    }
+
+    .pagination-numbers {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .book-card-actions {
         flex-direction: column;
     }
 }
