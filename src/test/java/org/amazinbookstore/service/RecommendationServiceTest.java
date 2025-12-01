@@ -1,5 +1,6 @@
 package org.amazinbookstore.service;
 
+import org.amazinbookstore.dto.RecommendationResponse;
 import org.amazinbookstore.exception.ResourceNotFoundException;
 import org.amazinbookstore.model.Book;
 import org.amazinbookstore.model.User;
@@ -14,14 +15,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Tests for the recommendation servie.
+ * Tests for the recommendation service.
  */
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -85,22 +85,84 @@ class RecommendationServiceTest {
         when(userRepository.findById("hajar")).thenReturn(Optional.of(hajar));
         when(bookService.getBookById("book3")).thenReturn(book3);
 
-        List<Book> recommendations = recommendationService.getRecommendations("hasib", 5);
+        RecommendationResponse response = recommendationService.getRecommendations("hasib", 5);
 
-        assertEquals(1, recommendations.size());
-        assertEquals("book3", recommendations.get(0).getId());
+        assertEquals(1, response.getBooks().size());
+        assertEquals("book3", response.getBooks().get(0).getId());
+        assertFalse(response.isFallback());
     }
 
     @Test
-    void shouldReturnEmptyListWhenUserHasNoPurchases() {
-        // can't recommend anything if user hasn't bought anything yet
+    void shouldFallbackToPopularBooksWhenUserHasNoPurchases() {
+        // new user with no history should see popular books
         User newUser = new User();
         newUser.setId("newbie");
         newUser.setPurchasedBookIds(new ArrayList<>());
 
         when(userRepository.findById("newbie")).thenReturn(Optional.of(newUser));
-        List<Book> recommendations = recommendationService.getRecommendations("newbie", 5);
-        assertTrue(recommendations.isEmpty());
+        when(userRepository.findAll()).thenReturn(Arrays.asList(newUser, hajar, yusuf));
+        when(bookService.getBookById("book1")).thenReturn(book1);
+        when(bookService.getBookById("book2")).thenReturn(book2);
+        when(bookService.getBookById("book3")).thenReturn(book3);
+        when(bookService.getBookById("book4")).thenReturn(book4);
+
+        RecommendationResponse response = recommendationService.getRecommendations("newbie", 5);
+
+        assertFalse(response.getBooks().isEmpty());
+        assertTrue(response.isFallback());
+        assertTrue(response.getMessage().contains("couldn't find"));
+    }
+
+    @Test
+    void shouldFallbackToPopularBooksWhenNoSimilarUsers() {
+        // Hasib bought unique books that nobody else has
+        User uniqueHasib = new User();
+        uniqueHasib.setId("uniqueHasib");
+        uniqueHasib.setUsername("uniqueHasib");
+        uniqueHasib.setPurchasedBookIds(new ArrayList<>(Arrays.asList("rareBook1", "rareBook2")));
+
+        // other users bought different stuff
+        when(userRepository.findById("uniqueHasib")).thenReturn(Optional.of(uniqueHasib));
+        when(userRepository.findAll()).thenReturn(Arrays.asList(uniqueHasib, hajar, yusuf));
+        when(bookService.getBookById("book1")).thenReturn(book1);
+        when(bookService.getBookById("book2")).thenReturn(book2);
+        when(bookService.getBookById("book3")).thenReturn(book3);
+        when(bookService.getBookById("book4")).thenReturn(book4);
+
+        RecommendationResponse response = recommendationService.getRecommendations("uniqueHasib", 5);
+
+        // should fall back to popular books since no one shares his taste
+        assertTrue(response.isFallback());
+        assertFalse(response.getBooks().isEmpty());
+    }
+
+    @Test
+    void shouldReturnPopularBooksSortedByPurchaseCount() {
+        // Hasib bought unique stuff, so we fall back to popular
+        User uniqueHasib = new User();
+        uniqueHasib.setId("uniqueHasib");
+        uniqueHasib.setPurchasedBookIds(new ArrayList<>(Arrays.asList("rareBook")));
+
+        // book1 was bought by 2 people, book4 by 1 person
+        User buyer1 = new User();
+        buyer1.setId("buyer1");
+        buyer1.setPurchasedBookIds(new ArrayList<>(Arrays.asList("book1")));
+
+        User buyer2 = new User();
+        buyer2.setId("buyer2");
+        buyer2.setPurchasedBookIds(new ArrayList<>(Arrays.asList("book1", "book4")));
+
+        when(userRepository.findById("uniqueHasib")).thenReturn(Optional.of(uniqueHasib));
+        when(userRepository.findAll()).thenReturn(Arrays.asList(uniqueHasib, buyer1, buyer2));
+        when(bookService.getBookById("book1")).thenReturn(book1);
+        when(bookService.getBookById("book4")).thenReturn(book4);
+
+        RecommendationResponse response = recommendationService.getRecommendations("uniqueHasib", 5);
+
+        // book1 should come first since 2 people bought it
+        assertEquals(2, response.getBooks().size());
+        assertEquals("book1", response.getBooks().get(0).getId());
+        assertTrue(response.isFallback());
     }
 
     @Test
@@ -114,7 +176,7 @@ class RecommendationServiceTest {
 
     @Test
     void shouldRespectMaxRecommendationsLimit() {
-        // if htere are alot of recommendations should be capped to max
+        // if there are a lot of recommendations should be capped to max
         User bookworm = new User();
         bookworm.setId("bookworm");
         bookworm.setPurchasedBookIds(new ArrayList<>(Arrays.asList("book1", "book3", "book4")));
@@ -123,12 +185,10 @@ class RecommendationServiceTest {
         when(userRepository.findAll()).thenReturn(Arrays.asList(hasib, bookworm));
         when(userRepository.findById("bookworm")).thenReturn(Optional.of(bookworm));
         when(bookService.getBookById("book3")).thenReturn(book3);
-        // not stubbing book4 because we only ask for 1 and book3 comes first
 
-        // only ask for 1 recommendation even though there are 2 available
-        List<Book> recommendations = recommendationService.getRecommendations("hasib", 1);
+        RecommendationResponse response = recommendationService.getRecommendations("hasib", 1);
 
-        assertEquals(1, recommendations.size());
+        assertEquals(1, response.getBooks().size());
     }
 
     @Test
@@ -139,31 +199,35 @@ class RecommendationServiceTest {
         when(userRepository.findById("hajar")).thenReturn(Optional.of(hajar));
         when(bookService.getBookById("book3")).thenReturn(book3);
 
-        List<Book> recommendations = recommendationService.getRecommendations("hasib", 10);
+        RecommendationResponse response = recommendationService.getRecommendations("hasib", 10);
 
         // should only get book3 not book1 or book2 which Hasib already owns
-        for (Book book : recommendations) {
+        for (Book book : response.getBooks()) {
             assertNotEquals("book1", book.getId());
             assertNotEquals("book2", book.getId());
         }
     }
 
     @Test
-    void shouldHandleDeletedBooks() {
-        // if a book was deleted from the system, we should just skip it
+    void shouldHandleDeletedBooksAndFallbackIfNeeded() {
+        // if similar user's books are all deleted, fall back to popular
         when(userRepository.findById("hasib")).thenReturn(Optional.of(hasib));
-        when(userRepository.findAll()).thenReturn(Arrays.asList(hasib, hajar));
+        when(userRepository.findAll()).thenReturn(Arrays.asList(hasib, hajar, yusuf));
         when(userRepository.findById("hajar")).thenReturn(Optional.of(hajar));
         when(bookService.getBookById("book3")).thenThrow(new ResourceNotFoundException("Book not found"));
+        when(bookService.getBookById("book4")).thenReturn(book4);
 
-        // should not raise an error, just return empty since the only candidate book is gone
-        List<Book> recommendations = recommendationService.getRecommendations("hasib", 5);
-        assertTrue(recommendations.isEmpty());
+        RecommendationResponse response = recommendationService.getRecommendations("hasib", 5);
+
+        // book3 is deleted, so we fall back to popular (book4 from yusuf)
+        assertTrue(response.isFallback());
+        assertEquals(1, response.getBooks().size());
+        assertEquals("book4", response.getBooks().get(0).getId());
     }
 
     @Test
     void shouldPrioritizeMoreSimilarUsers() {
-        // Hajar has higher jaccard similarity so her books should be recommended first
+        // user with higher jaccard similarity should have their books recommended first
         User hajarSuperFan = new User();
         hajarSuperFan.setId("hajarSuperFan");
         hajarSuperFan.setPurchasedBookIds(new ArrayList<>(Arrays.asList("book1", "book2", "book4")));
@@ -180,27 +244,30 @@ class RecommendationServiceTest {
         when(bookService.getBookById("book4")).thenReturn(book4);
         when(bookService.getBookById("book3")).thenReturn(book3);
 
-        List<Book> recommendations = recommendationService.getRecommendations("hasib", 5);
+        RecommendationResponse response = recommendationService.getRecommendations("hasib", 5);
 
         // book4 should come before book3 because hajarSuperFan is more similar to Hasib
-        assertEquals(2, recommendations.size());
-        assertEquals("book4", recommendations.get(0).getId());
-        assertEquals("book3", recommendations.get(1).getId());
+        assertEquals(2, response.getBooks().size());
+        assertEquals("book4", response.getBooks().get(0).getId());
+        assertEquals("book3", response.getBooks().get(1).getId());
+        assertFalse(response.isFallback());
     }
 
     @Test
-    void shouldReturnEmptyWhenNoOtherUsersExist() {
-        // Hasib is the only user in the system
+    void shouldFallbackWhenOnlyUserInSystem() {
+        // Hasib is the only user - no one to compare with
         when(userRepository.findById("hasib")).thenReturn(Optional.of(hasib));
         when(userRepository.findAll()).thenReturn(Arrays.asList(hasib));
 
-        List<Book> recommendations = recommendationService.getRecommendations("hasib", 5);
-        assertTrue(recommendations.isEmpty());
+        RecommendationResponse response = recommendationService.getRecommendations("hasib", 5);
+
+        // no other users means empty (can't even do popular since no one else bought anything)
+        assertTrue(response.getBooks().isEmpty());
     }
 
     @Test
     void shouldIgnoreUsersWithNoPurchases() {
-        // users who haven't bought anything shouldn't affect recommendations
+        // lurkers who haven't bought anything shouldn't affect recommendations
         User lurker = new User();
         lurker.setId("lurker");
         lurker.setPurchasedBookIds(new ArrayList<>());
@@ -210,10 +277,36 @@ class RecommendationServiceTest {
         when(userRepository.findById("hajar")).thenReturn(Optional.of(hajar));
         when(bookService.getBookById("book3")).thenReturn(book3);
 
-        List<Book> recommendations = recommendationService.getRecommendations("hasib", 5);
+        RecommendationResponse response = recommendationService.getRecommendations("hasib", 5);
 
         // should still work, just ignoring the lurker
-        assertEquals(1, recommendations.size());
-        assertEquals("book3", recommendations.get(0).getId());
+        assertEquals(1, response.getBooks().size());
+        assertEquals("book3", response.getBooks().get(0).getId());
+        assertFalse(response.isFallback());
+    }
+
+    @Test
+    void shouldExcludeOwnedBooksFromPopularFallback() {
+        // when falling back to popular, don't recommend books user already has
+        User uniqueHasib = new User();
+        uniqueHasib.setId("uniqueHasib");
+        uniqueHasib.setPurchasedBookIds(new ArrayList<>(Arrays.asList("book1"))); // owns book1
+
+        User buyer = new User();
+        buyer.setId("buyer");
+        buyer.setPurchasedBookIds(new ArrayList<>(Arrays.asList("book3", "book4"))); // no overlap
+
+        when(userRepository.findById("uniqueHasib")).thenReturn(Optional.of(uniqueHasib));
+        when(userRepository.findAll()).thenReturn(Arrays.asList(uniqueHasib, buyer));
+        when(bookService.getBookById("book3")).thenReturn(book3);
+        when(bookService.getBookById("book4")).thenReturn(book4);
+
+        RecommendationResponse response = recommendationService.getRecommendations("uniqueHasib", 5);
+
+        // should not include book1 since uniqueHasib already owns it
+        for (Book book : response.getBooks()) {
+            assertNotEquals("book1", book.getId());
+        }
+        assertTrue(response.isFallback());
     }
 }
