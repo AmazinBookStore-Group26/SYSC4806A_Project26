@@ -10,16 +10,17 @@
     <link rel="stylesheet" th:href="@{/css/style.css}" />
   </head>
   <body>
-    <div class="container">
+    <div class="container full-width">
       <header>
         <h1>Amazin Bookstore</h1>
         <nav>
           <a href="/">Home</a>
           <a href="/cart" sec:authorize="isAuthenticated()">Cart</a>
             <a href="/orders" sec:authorize="isAuthenticated()">My Orders</a>
-            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
             <a href="/recommendations" sec:authorize="isAuthenticated()">Recommendations</a>
-          <span sec:authorize="isAuthenticated()">
+            <a href="/admin" sec:authorize="hasRole('OWNER')">Admin Panel</a>
+
+            <span sec:authorize="isAuthenticated()">
             Welcome, <span sec:authentication="name"></span> |
             <form th:action="@{/logout}" method="post" style="display: inline">
               <button type="submit" class="btn-link">Logout</button>
@@ -44,7 +45,6 @@
               th:unless="${book.pictureUrl != null and !book.pictureUrl.isEmpty()}"
               class="book-details-image-placeholder"
             >
-              📚
             </div>
           </div>
 
@@ -55,84 +55,86 @@
               by <span th:text="${book.author}">Author Name</span>
             </p>
 
-            <div
-              class="book-price"
-              th:text="'$' + ${#numbers.formatDecimal(book.price, 1, 2)}"
-            >
-              $0.00
+            <div class="book-price-large" th:text="'$' + ${#numbers.formatDecimal(book.price, 1, 2)}">$0.00</div>
+
+            <!-- Stock Status Badge -->
+            <div class="stock-badge-container">
+              <span th:if="${book.inventory > 10}" class="stock-badge in-stock">In Stock</span>
+              <span th:if="${book.inventory > 0 and book.inventory <= 10}" class="stock-badge low-stock">
+                Only <span th:text="${book.inventory}">5</span> left!
+              </span>
+              <span th:if="${book.inventory == 0}" class="stock-badge out-of-stock">Out of Stock</span>
             </div>
 
-            <div style="margin: 25px 0">
-              <p>
-                <strong>Publisher:</strong>
-                <span th:text="${book.publisher}">Publisher</span>
-              </p>
-              <p>
-                <strong>ISBN:</strong> <span th:text="${book.isbn}">ISBN</span>
-              </p>
-              <p th:if="${book.genre}">
-                <strong>Genre:</strong>
-                <span th:text="${book.genre}">Genre</span>
-              </p>
-              <p th:if="${book.publicationYear}">
-                <strong>Publication Year:</strong>
-                <span th:text="${book.publicationYear}">Year</span>
-              </p>
+            <!-- Book Details Grid -->
+            <div class="book-details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Publisher</span>
+                <span class="detail-value" th:text="${book.publisher}">Publisher Name</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">ISBN</span>
+                <span class="detail-value" th:text="${book.isbn}">978-0000000000</span>
+              </div>
+              <div class="detail-item" th:if="${book.genre}">
+                <span class="detail-label">Genre</span>
+                <span class="detail-value" th:text="${book.genre}">Fiction</span>
+              </div>
+              <div class="detail-item" th:if="${book.publicationYear}">
+                <span class="detail-label">Publication Year</span>
+                <span class="detail-value" th:text="${book.publicationYear}">2024</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Availability</span>
+                <span class="detail-value" th:text="${book.inventory} + ' copies available'">10 copies available</span>
+              </div>
             </div>
 
-            <div style="margin: 25px 0">
-              <p><strong>Description:</strong></p>
-              <p
-                th:text="${book.description}"
-                style="margin-top: 10px; line-height: 1.8"
-              >
-                Book description goes here...
-              </p>
+            <!-- Description Section -->
+            <div class="book-description-section" th:if="${book.description != null and !book.description.isEmpty()}">
+              <h3>About this Book</h3>
+              <p th:text="${book.description}">Book description goes here...</p>
             </div>
 
-            <div
-              th:classappend="${book.inventory < 5} ? 'book-inventory low' : 'book-inventory'"
-              style="font-size: 1.1em; margin: 20px 0"
-            >
-              <span
+            <!-- Add to Cart Section -->
+            <div class="add-to-cart-section">
+              <form
                 th:if="${book.inventory > 0}"
-                th:text="${book.inventory} + ' available'"
-                >10 available</span
+                id="addToCartForm"
+                class="add-to-cart-form"
+                th:attr="data-book-id=${book.id}"
+                sec:authorize="isAuthenticated()"
               >
-              <span
-                th:if="${book.inventory == 0}"
-                style="color: #8b4545; font-weight: bold"
-                >Out of stock</span
-              >
-            </div>
+                <div class="quantity-selector">
+                  <label for="quantity">Quantity:</label>
+                  <div class="quantity-input-wrapper">
+                    <button type="button" class="qty-btn" onclick="decreaseQty()">-</button>
+                    <input
+                      type="number"
+                      id="quantity"
+                      name="quantity"
+                      value="1"
+                      min="1"
+                      th:max="${book.inventory}"
+                      required
+                    />
+                    <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-success btn-large">Add to Cart</button>
+              </form>
 
-            <form
-              th:if="${book.inventory > 0}"
-              id="addToCartForm"
-              class="add-to-cart-form"
-              th:attr="data-book-id=${book.id}"
-            >
-              <label for="quantity"><strong>Quantity:</strong></label>
-              <input
-                type="number"
-                id="quantity"
-                name="quantity"
-                value="1"
-                min="1"
-                th:max="${book.inventory}"
-                required
-              />
-              <button type="submit" class="btn btn-success">Add to Cart</button>
-            </form>
+              <div th:if="${book.inventory > 0}" sec:authorize="!isAuthenticated()" class="login-prompt">
+                <p>Please log in to add items to your cart</p>
+                <a href="/login" class="btn btn-success btn-large">Login to Purchase</a>
+              </div>
 
-            <div th:if="${book.inventory == 0}">
-              <button
-                class="btn"
-                disabled
-                style="opacity: 0.5; cursor: not-allowed"
-              >
-                Out of Stock
-              </button>
+              <div th:if="${book.inventory == 0}" class="out-of-stock-message">
+                <button class="btn btn-large" disabled style="opacity: 0.5; cursor: not-allowed;">
+                  Out of Stock
+                </button>
+                <p>This item is currently unavailable</p>
+              </div>
             </div>
           </div>
         </div>
